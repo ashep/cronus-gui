@@ -1,6 +1,6 @@
 # Cronus GUI
 
-Graphical user interface for Cronus -- a minimalistic ESP32-based digital clock.
+Graphical user interface for [Cronus] -- a minimalistic ESP32-based digital clock.
 
 ## Set up
 
@@ -25,3 +25,5 @@ npm run build
 ## Authors
 
 - [Oleksandr Shepetko](https://shepetko.com) -- initial work.
+
+[Cronus]: https://github.com/ashep/cronus
