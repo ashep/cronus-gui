@@ -1,0 +1,5 @@
+on: push
+jobs:
+  build:
+    uses: ashep/ci/.github/workflows/js-build.yaml@v1
+    
