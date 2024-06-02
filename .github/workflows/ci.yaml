@@ -9,6 +9,8 @@ jobs:
 
   deploy:
     uses: ashep/ci/.github/workflows/deploy-docker.yaml@v1
+    needs:
+      - build
     secrets:
       docker_host: ${{ secrets.DEPLOY_DOCKER_HOST }}
       private_key: ${{ secrets.DEPLOY_DOCKER_PRIVATE_KEY }}
