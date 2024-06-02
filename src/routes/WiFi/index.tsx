@@ -16,7 +16,7 @@ import * as BTSvc from "../../service/Bluetooth";
 import * as WiFiSvc from "../../service/WiFi";
 
 interface Props {
-    btSvc: BTSvc.Service
+    btConnStatus: BTSvc.ConnStatus
     wifiSvc: WiFiSvc.Service
 }
 
@@ -125,7 +125,8 @@ export default class WiFi extends React.Component<Props, State> {
             <Stack direction={"column"} spacing={1}>
                 {this.props.wifiSvc.connectedSSID &&
                     <Typography variant={"subtitle1"} sx={{mb: 2}}>
-                        <WiFiIcon sx={{verticalAlign: "middle"}}/> Connected to <b>{this.props.wifiSvc.connectedSSID}</b>
+                        <WiFiIcon sx={{verticalAlign: "middle"}}/> Connected
+                        to <b>{this.props.wifiSvc.connectedSSID}</b>
                     </Typography>
                 }
                 <Button variant={"contained"}
@@ -157,30 +158,29 @@ export default class WiFi extends React.Component<Props, State> {
         >
             <CssBaseline/>
 
-            {
-                this.props.btSvc.connStatus != BTSvc.ConnStatus.CONNECTED
-                    ?
-                    <Box>
-                        You're not connected to your Cronus device.
-                        Click <Link href={"/"}>here</Link> to connect.
-                    </Box>
-                    :
-                    <Stack direction={"column"} spacing={1}>
-                        {
-                            this.props.wifiSvc.connStatus != WiFiSvc.ConnStatus.CONNECTED &&
-                            this.state.credentials.ssid == "" &&
-                            this.renderSSIDChooser()
-                        }
-                        {
-                            this.props.wifiSvc.connStatus != WiFiSvc.ConnStatus.CONNECTED &&
-                            this.state.credentials.ssid != "" &&
-                            this.renderCredentialsForm()
-                        }
-                        {
-                            this.props.wifiSvc.connStatus == WiFiSvc.ConnStatus.CONNECTED &&
-                            this.renderConnected()
-                        }
-                    </Stack>
+            {this.props.btConnStatus != BTSvc.ConnStatus.CONNECTED
+                ?
+                <Box>
+                    You're not connected to your Cronus device.
+                    Click <Link href={"/"}>here</Link> to connect.
+                </Box>
+                :
+                <Stack direction={"column"} spacing={1}>
+                    {
+                        this.props.wifiSvc.connStatus != WiFiSvc.ConnStatus.CONNECTED &&
+                        this.state.credentials.ssid == "" &&
+                        this.renderSSIDChooser()
+                    }
+                    {
+                        this.props.wifiSvc.connStatus != WiFiSvc.ConnStatus.CONNECTED &&
+                        this.state.credentials.ssid != "" &&
+                        this.renderCredentialsForm()
+                    }
+                    {
+                        this.props.wifiSvc.connStatus == WiFiSvc.ConnStatus.CONNECTED &&
+                        this.renderConnected()
+                    }
+                </Stack>
             }
         </Grid>;
     }
