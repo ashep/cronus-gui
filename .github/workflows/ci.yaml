@@ -12,6 +12,7 @@ jobs:
     needs:
       - build
     with:
+      dotenv: ${{ vard.DEPLOY_DOTENV }}
       ssh_port: ${{ vars.DEPLOY_SSH_PORT }}
     secrets:
       ssh_host: ${{ secrets.DEPLOY_SSH_HOST }}
