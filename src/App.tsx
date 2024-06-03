@@ -21,8 +21,8 @@ export default class App extends React.Component <{}, {}> {
     render(): JSX.Element {
         return (
             <Router>
-                <Home path={"/"} btSvc={this.btSvc}/>
-                <WiFi path={"/wifi"} btConnStatus={this.btSvc.connStatus} wifiSvc={this.wifiSvc}/>
+                <Home path={"/device"} btSvc={this.btSvc}/>
+                <WiFi path={"/device/wifi"} btConnStatus={this.btSvc.connStatus} wifiSvc={this.wifiSvc}/>
             </Router>
         );
     }

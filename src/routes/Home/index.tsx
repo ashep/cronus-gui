@@ -35,7 +35,7 @@ export default class Home extends React.Component<Props, State> {
 
             <Stack direction={"column"} spacing={1}>
                     {this.props.btSvc.connStatus == BTConnStatus.CONNECTED &&
-                        <Button variant={"contained"} startIcon={<WiFiIcon/>} onClick={() => route("/wifi")}>
+                        <Button variant={"contained"} startIcon={<WiFiIcon/>} onClick={() => route("/device/wifi")}>
                             WiFi settings
                         </Button>
                     }

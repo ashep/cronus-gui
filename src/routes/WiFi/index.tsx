@@ -62,7 +62,7 @@ export default class WiFi extends React.Component<Props, State> {
                             {item}
                         </Button>
                     )}
-                    <Button variant={"outlined"} startIcon={<ArrowBackIcon/>} onClick={() => route("/")}>
+                    <Button variant={"outlined"} startIcon={<ArrowBackIcon/>} onClick={() => route("/device")}>
                         Back
                     </Button>
                 </Stack>
@@ -141,7 +141,7 @@ export default class WiFi extends React.Component<Props, State> {
                 >
                     Disconnect
                 </Button>
-                <Button variant={"outlined"} startIcon={<ArrowBackIcon/>} onClick={() => route("/")}>
+                <Button variant={"outlined"} startIcon={<ArrowBackIcon/>} onClick={() => route("/device")}>
                     Back
                 </Button>
             </Stack>
