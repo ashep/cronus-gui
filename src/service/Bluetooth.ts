@@ -78,7 +78,6 @@ export class Service {
             this.device = await navigator.bluetooth.requestDevice({
                 filters: [
                     {services: [this.svcUUID]},
-                    {namePrefix: "D5Y"},
                     {namePrefix: "Cronus"},
                 ],
             });
