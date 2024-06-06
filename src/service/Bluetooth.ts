@@ -25,10 +25,6 @@ export class Service {
         return this.cnStatus.value;
     }
 
-    set connStatus(v: ConnStatus) {
-        this.cnStatus.value = v;
-    }
-
     constructor(svcUUID: number, onConnect?: () => void, onDisconnect?: () => void) {
         this.svcUUID = svcUUID;
 
@@ -76,10 +72,11 @@ export class Service {
 
         try {
             this.device = await navigator.bluetooth.requestDevice({
-                filters: [
-                    {services: [this.svcUUID]},
-                    {namePrefix: "Cronus"},
-                ],
+                acceptAllDevices: true,
+                // filters: [
+                    // {services: [this.svcUUID]},
+                    // {namePrefix: "Cronus"},
+                // ],
             });
 
             this.server = await this.device.gatt?.connect();
