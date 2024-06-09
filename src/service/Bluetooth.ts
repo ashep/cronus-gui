@@ -72,11 +72,9 @@ export class Service {
 
         try {
             this.device = await navigator.bluetooth.requestDevice({
-                acceptAllDevices: true,
-                // filters: [
-                    // {services: [this.svcUUID]},
-                    // {namePrefix: "Cronus"},
-                // ],
+                filters: [
+                    {namePrefix: "Cronus"},
+                ],
             });
 
             this.server = await this.device.gatt?.connect();
