@@ -73,6 +73,7 @@ export class Service {
         try {
             this.device = await navigator.bluetooth.requestDevice({
                 filters: [
+                    {services: [0xFFFF]},
                     {namePrefix: "Cronus"},
                 ],
             });
