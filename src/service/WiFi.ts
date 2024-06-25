@@ -1,6 +1,6 @@
 import {signal, Signal} from "@preact/signals";
 
-import {Service as btSvc, ChcUUID} from "./Bluetooth";
+import {Service as btSvc} from "./Bluetooth";
 import {ConnStatus as btConnStatus} from "./Bluetooth";
 
 const wifiBTChcUUID = 0xff01;
@@ -37,7 +37,7 @@ export class Service {
     private _nextScanTime: number = 0;
 
     get connStatus(): ConnStatus {
-        return this._connStatus.value
+        return this._connStatus.value;
     }
 
     get ssidList(): Array<string> {

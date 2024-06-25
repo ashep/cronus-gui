@@ -162,7 +162,7 @@ export default class WiFi extends React.Component<Props, State> {
                 ?
                 <Box>
                     You're not connected to your Cronus device.
-                    Click <Link href={"/"}>here</Link> to connect.
+                    Click <Link href={"/device/"}>here</Link> to connect.
                 </Box>
                 :
                 <Stack direction={"column"} spacing={1}>
