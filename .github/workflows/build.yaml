@@ -1,4 +1,6 @@
-on: push
+on:
+  - push
+  - workflow_dispatch
 jobs:
   build:
     uses: ashep/ci/.github/workflows/js-build.yaml@v1
@@ -6,4 +8,3 @@ jobs:
       registry_user: ${{ vars.REGISTRY_USER }}
     secrets:
       registry_password: ${{ secrets.REGISTRY_PASSWORD }}
-
