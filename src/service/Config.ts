@@ -4,16 +4,65 @@ import {number} from "prop-types";
 
 const chcUUID = 0xff02;
 
-interface fwVer {
+class FirmwareVersion {
     Major: number;
     Minor: number;
     Patch: number;
     Alpha: number;
+
+    constructor(major: number = 0, minor: number = 0, patch: number = 0, alpha: number = 0) {
+        this.Major = major;
+        this.Minor = minor;
+        this.Patch = patch;
+        this.Alpha = alpha;
+    }
+
+    GreaterThanOrEqualTo(other: FirmwareVersion): boolean {
+        if (this.Major > other.Major) {
+            return true;
+        } else if (this.Major < other.Major) {
+            return false;
+        }
+
+        if (this.Minor > other.Minor) {
+            return true;
+        } else if (this.Minor < other.Minor) {
+            return false;
+        }
+
+        if (this.Patch > other.Patch) {
+            return true;
+        } else if (this.Patch < other.Patch) {
+            return false;
+        }
+
+        if (this.Alpha === 0) {
+            return true;
+        }
+
+        return this.Alpha >= other.Alpha;
+    }
+
+    GreaterThanOrEqualToString(other: string): boolean {
+        const parts = other.split('.');
+
+        if (parts.length < 3) {
+            throw new Error("Invalid version string format. Expected format: 'major.minor.patch[.alpha]'");
+        }
+
+        const major = parseInt(parts[0]);
+        const minor = parseInt(parts[1]);
+        const patch = parseInt(parts[2]);
+        const alpha = parts.length > 3 ? parseInt(parts[3].replace('alpha', '')) : 0;
+
+        return this.GreaterThanOrEqualTo(new FirmwareVersion(major, minor, patch, alpha));
+    }
 }
 
 export enum DisplayType {
     NONE = 0,
     MAX7219_32X16 = 1,
+    WS2812_32X16 = 2,
 }
 
 enum displayShowMode {
@@ -41,12 +90,13 @@ enum cfgID {
     showAmbTempDuration = 134,
     showOdrTempDuration = 135,
     allowUnstableFirmware = 136,
+    showWeatherIconDuration = 137,
 }
 
 export class Service {
     private btSvc: btSvc;
 
-    private fwVer: Signal<fwVer> = signal({Major: 0, Minor: 0, Patch: 0, Alpha: 0});
+    private fwVer: Signal<FirmwareVersion> = signal(new FirmwareVersion(0, 0, 0, 0));
 
     private displayType: Signal<DisplayType> = signal(DisplayType.NONE);
 
@@ -62,11 +112,16 @@ export class Service {
     private showDOWDuration: Signal<number> = signal(5);
     private showAmbTempDuration: Signal<number> = signal(5);
     private showOdrTempDuration: Signal<number> = signal(5);
+    private showWeatherIconDuration: Signal<number> = signal(5);
     private allowUnstableFirmware: Signal<boolean> = signal(false);
 
     constructor(btSvc: btSvc) {
         this.btSvc = btSvc;
         setInterval(this.fetch.bind(this), 1000);
+    }
+
+    get FirmwareVersion(): FirmwareVersion {
+        return this.fwVer.value;
     }
 
     get FirmwareVersionString(): string {
@@ -109,6 +164,10 @@ export class Service {
 
     get ShowDateDuration(): number {
         return this.showDateDuration.value;
+    }
+
+    get ShowWeatherIconDuration(): number {
+        return this.showWeatherIconDuration.value;
     }
 
     get ShowOdrTempDuration(): number {
@@ -163,6 +222,11 @@ export class Service {
         return this.setCfgVal(cfgID.showOdrTempDuration, v)
     }
 
+    async SetShowWeatherIconDuration(v: number): Promise<void> {
+        this.showWeatherIconDuration.value = v;
+        return this.setCfgVal(cfgID.showWeatherIconDuration, v)
+    }
+
     async SetAllowUnstableFirmware(v: boolean): Promise<void> {
         this.allowUnstableFirmware.value = v;
         return this.setCfgVal(cfgID.allowUnstableFirmware, Number(v))
@@ -184,12 +248,12 @@ export class Service {
 
         let data = await this.btSvc.read(chcUUID);
 
-        this.fwVer.value = {
-            Major: data.getInt8(cfgID.appVerMajor),
-            Minor: data.getInt8(cfgID.appVerMinor),
-            Patch: data.getInt8(cfgID.appVerPatch),
-            Alpha: data.getInt8(cfgID.appVerAlpha),
-        };
+        this.fwVer.value = new FirmwareVersion(
+            data.getInt8(cfgID.appVerMajor),
+            data.getInt8(cfgID.appVerMinor),
+            data.getInt8(cfgID.appVerPatch),
+            data.getInt8(cfgID.appVerAlpha),
+        );
 
         this.displayType.value = data.getInt8(cfgID.displayType);
 

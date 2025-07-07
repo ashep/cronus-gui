@@ -150,6 +150,23 @@ export default class Display extends React.Component<Props, State> {
                         </Select>
                     </FormControl>
 
+                    {(!this.props.cfgSvc.MultilineMode && this.props.cfgSvc.FirmwareVersion.GreaterThanOrEqualToString("0.0.1")) && (
+                        <FormControl variant="standard">
+                            <InputLabel id="show-weather-icon-duration-label">Show weather icon</InputLabel>
+                            <Select
+                                labelId="show-weather-icon-duration"
+                                id="show-weather-icon-select"
+                                value={this.props.cfgSvc.ShowWeatherIconDuration}
+                                label="Show weather icon"
+                                onChange={(_, v) => this.props.cfgSvc.SetShowWeatherIconDuration(v.props.value)}
+                            >
+                                {durationValues.map(opt => (
+                                    <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    )}
+
                     <Button variant={"outlined"} startIcon={<ArrowBackIcon/>} onClick={() => route("/device")}>
                         Back
                     </Button>
