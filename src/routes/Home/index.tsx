@@ -11,7 +11,7 @@ import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings';
 import EngineeringIcon from '@mui/icons-material/Engineering';
 
 import {Service as BTSvc, ConnStatus as BTConnStatus} from "../../service/Bluetooth";
-import {Service as ConfigSvc} from '../../service/Config';
+import {Service as ConfigSvc} from '../../service/ConfigV1';
 import Bluetooth from '../../components/Bluetooth';
 
 interface Props {

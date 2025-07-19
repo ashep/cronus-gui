@@ -2,7 +2,7 @@ import * as React from 'react';
 import Button from "@mui/material/Button";
 import {useTranslation} from "react-i18next";
 import {Service as BTSvc, ConnStatus as BTConnStatus} from "../../service/Bluetooth";
-import {Service as ConfigSvc} from '../../service/Config';
+import {Service as ConfigSvc} from '../../service/ConfigV1';
 import BluetoothIcon from "@mui/icons-material/Bluetooth";
 import Typography from "@mui/material/Typography";
 

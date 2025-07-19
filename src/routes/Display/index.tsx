@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as BTSvc from "../../service/Bluetooth";
-import * as ConfigSvc from "../../service/Config";
+import * as ConfigSvc from "../../service/ConfigV1";
 import {Link, route} from "preact-router";
 
 import Grid from "@mui/material/Grid";

@@ -262,6 +262,9 @@ export class Service {
 
         this.multilineMode.value = data.getInt8(cfgID.displayShowMode) == displayShowMode.MultiLine;
 
+        this.displayMinBrightness.value = data.getInt8(cfgID.displayMinBrightness);
+        this.displayMaxBrightness.value = data.getInt8(cfgID.displayMaxBrightness);
+
         this.showTimeDuration.value = data.getInt8(cfgID.showTimeDuration);
         this.showDateDuration.value = data.getInt8(cfgID.showDateDuration);
         this.showDOWDuration.value = data.getInt8(cfgID.showDOWDuration);

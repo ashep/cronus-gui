@@ -3,7 +3,7 @@ import Router from 'preact-router';
 
 import * as BTSvc from './service/Bluetooth';
 import * as WiFiSvc from './service/WiFi';
-import * as ConfigSvc from './service/Config';
+import * as ConfigSvc from './service/ConfigV1';
 
 import Home from './routes/Home';
 import WiFi from './routes/WiFi';
