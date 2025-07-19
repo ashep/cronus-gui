@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as BTSvc from "../../service/Bluetooth";
-import * as ConfigSvc from "../../service/ConfigV1";
+import * as Config from "../../service/Config";
 
 import Grid from "@mui/material/Grid";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -18,7 +18,7 @@ import MenuItem from "@mui/material/MenuItem";
 
 interface Props {
     btConnStatus: BTSvc.ConnStatus
-    cfgSvc: ConfigSvc.Service
+    cfg: Config.Service
 }
 
 interface State {
@@ -46,8 +46,8 @@ export default class Misc extends React.Component<Props, State> {
                     <FormControlLabel
                         label="Allow unstable releases"
                         control={
-                            <Checkbox checked={this.props.cfgSvc.AllowUnstableFirmware}
-                                      onChange={(_, v) => this.props.cfgSvc.SetAllowUnstableFirmware(v)}
+                            <Checkbox checked={this.props.cfg.AllowUnstableFirmware}
+                                      onChange={(_, v) => this.props.cfg.SetAllowUnstableFirmware(v)}
                             />
                         }
                     />
@@ -57,9 +57,9 @@ export default class Misc extends React.Component<Props, State> {
                         <Select
                             labelId="ds3231-pin-scl"
                             id="ds3231-pin-scl-select"
-                            value={this.props.cfgSvc.RTPPinSCL}
+                            value={this.props.cfg.RTPPinSCL}
                             label="ds3231-pin-scl"
-                            onChange={(_, v) => this.props.cfgSvc.SetRTCPinSCL(v.props.value)}
+                            onChange={(_, v) => this.props.cfg.SetRTCPinSCL(v.props.value)}
                         >
                             <MenuItem key={38} value={38}>{38}</MenuItem>
                             <MenuItem key={39} value={39}>{39}</MenuItem>
@@ -71,9 +71,9 @@ export default class Misc extends React.Component<Props, State> {
                         <Select
                             labelId="ds3231-pin-scl"
                             id="ds3231-pin-scl-select"
-                            value={this.props.cfgSvc.RTPPinSDA}
+                            value={this.props.cfg.RTPPinSDA}
                             label="ds3231-pin-scl"
-                            onChange={(_, v) => this.props.cfgSvc.SetRTCPinSDA(v.props.value)}
+                            onChange={(_, v) => this.props.cfg.SetRTCPinSDA(v.props.value)}
                         >
                             <MenuItem key={38} value={38}>{38}</MenuItem>
                             <MenuItem key={39} value={39}>{39}</MenuItem>

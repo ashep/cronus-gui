@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as BTSvc from "../../service/Bluetooth";
-import * as ConfigSvc from "../../service/ConfigV1";
+import * as ConfigSvc from "../../service/Config";
 import {Link, route} from "preact-router";
 
 import Grid from "@mui/material/Grid";
@@ -16,10 +16,11 @@ import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import {ComponentChild} from "preact";
 
 interface Props {
     btConnStatus: BTSvc.ConnStatus
-    cfgSvc: ConfigSvc.Service
+    cfg: ConfigSvc.Service
 }
 
 interface State {
@@ -57,15 +58,16 @@ export default class Display extends React.Component<Props, State> {
                 ?
                 <Box>
                     You're not connected to your Cronus device.
-                    Click <Link href={"/device"}>here</Link> to connect.
+                    Click <Link  href={"/device"}>here</Link> to connect.
                 </Box>
                 :
                 <Stack direction={"column"} spacing={3}>
                     <FormControlLabel
                         label="Multiline mode"
                         control={
-                            <Checkbox checked={this.props.cfgSvc.MultilineMode}
-                                      onChange={(_, v) => this.props.cfgSvc.SetMultilineMode(v)}
+                            <Checkbox checked={this.props.cfg.MultilineMode}
+                                      onChange={(_, v) =>
+                                          this.props.cfg.SetMultilineMode(v)}
                             />
                         }
                     />
@@ -75,12 +77,13 @@ export default class Display extends React.Component<Props, State> {
                         <Select
                             labelId="min-brightness-duration"
                             id="min-brightness-duration-select"
-                            value={this.props.cfgSvc.DisplayMinBrightness}
+                            value={this.props.cfg.DisplayMinBrightness}
                             label="minimum brightness level"
-                            onChange={(_, v) => this.props.cfgSvc.SetDisplayMinBrightness(v.props.value)}
+                            onChange={(e) =>
+                                this.props.cfg.SetDisplayMinBrightness(Number((e.target as HTMLInputElement).value))}
                         >
                             {brightnessValues.map((opt) => {
-                                    if (opt.value <= this.props.cfgSvc.DisplayMaxBrightness) {
+                                    if (opt.value <= this.props.cfg.DisplayMaxBrightness) {
                                         return <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
                                     }
                                 }
@@ -93,9 +96,10 @@ export default class Display extends React.Component<Props, State> {
                         <Select
                             labelId="max-brightness-duration"
                             id="max-brightness-duration-select"
-                            value={this.props.cfgSvc.DisplayMaxBrightness}
+                            value={this.props.cfg.DisplayMaxBrightness}
                             label="Maximum brightness level"
-                            onChange={(_, v) => this.props.cfgSvc.SetDisplayMaxBrightness(v.props.value)}
+                            onChange={(e) =>
+                                this.props.cfg.SetDisplayMaxBrightness(Number((e.target as HTMLInputElement).value))}
                         >
                             {brightnessValues.map(opt => (
                                 <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
@@ -103,15 +107,16 @@ export default class Display extends React.Component<Props, State> {
                         </Select>
                     </FormControl>
 
-                    {!this.props.cfgSvc.MultilineMode && (
+                    {!this.props.cfg.MultilineMode && (
                         <FormControl variant="standard">
                             <InputLabel id="show-time-duration-label">Show time</InputLabel>
                             <Select
                                 labelId="show-time-duration"
                                 id="show-time-duration-select"
-                                value={this.props.cfgSvc.ShowTimeDuration}
+                                value={this.props.cfg.ShowTimeDuration}
                                 label="Show time"
-                                onChange={(_, v) => this.props.cfgSvc.SetShowTimeDuration(v.props.value)}
+                                onChange={(e) =>
+                                    this.props.cfg.SetShowTimeDuration(Number((e.target as HTMLInputElement).value))}
                             >
                                 {durationValues.map(opt => (
                                     <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
@@ -125,9 +130,10 @@ export default class Display extends React.Component<Props, State> {
                         <Select
                             labelId="show-time-duration"
                             id="show-time-duration-select"
-                            value={this.props.cfgSvc.ShowDateDuration}
+                            value={this.props.cfg.ShowDateDuration}
                             label="Show time"
-                            onChange={(_, v) => this.props.cfgSvc.SetShowDateDuration(v.props.value)}
+                            onChange={(e) =>
+                                this.props.cfg.SetShowDateDuration(Number((e.target as HTMLInputElement).value))}
                         >
                             {durationValues.map(opt => (
                                 <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
@@ -140,9 +146,10 @@ export default class Display extends React.Component<Props, State> {
                         <Select
                             labelId="show-odr-temp-duration"
                             id="show-odr-duration-select"
-                            value={this.props.cfgSvc.ShowOdrTempDuration}
+                            value={this.props.cfg.ShowOdrTempDuration}
                             label="Show outdoor temperature"
-                            onChange={(_, v) => this.props.cfgSvc.SetShowOdrTempDuration(v.props.value)}
+                            onChange={(e) =>
+                                this.props.cfg.SetShowOdrTempDuration(Number((e.target as HTMLInputElement).value))}
                         >
                             {durationValues.map(opt => (
                                 <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
@@ -150,15 +157,16 @@ export default class Display extends React.Component<Props, State> {
                         </Select>
                     </FormControl>
 
-                    {(!this.props.cfgSvc.MultilineMode && this.props.cfgSvc.FirmwareVersion.GreaterThanOrEqualToString("0.0.1")) && (
+                    {(!this.props.cfg.MultilineMode && this.props.cfg.FirmwareVersion.GreaterThanOrEqualToString("0.0.1")) && (
                         <FormControl variant="standard">
                             <InputLabel id="show-weather-icon-duration-label">Show weather icon</InputLabel>
                             <Select
                                 labelId="show-weather-icon-duration"
                                 id="show-weather-icon-select"
-                                value={this.props.cfgSvc.ShowWeatherIconDuration}
+                                value={this.props.cfg.ShowWeatherIconDuration}
                                 label="Show weather icon"
-                                onChange={(_, v) => this.props.cfgSvc.SetShowWeatherIconDuration(v.props.value)}
+                                onChange={(e) =>
+                                    this.props.cfg.SetShowWeatherIconDuration(Number((e.target as HTMLInputElement).value))}
                             >
                                 {durationValues.map(opt => (
                                     <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>

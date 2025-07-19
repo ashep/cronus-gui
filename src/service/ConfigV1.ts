@@ -1,74 +1,8 @@
 import {signal, Signal} from "@preact/signals";
 import {ConnStatus as btConnStatus, Service as btSvc} from "./Bluetooth";
-import {number} from "prop-types";
+import {FirmwareVersion, DisplayType, DisplayShowMode} from "./Types";
 
 const chcUUID = 0xff02;
-
-class FirmwareVersion {
-    Major: number;
-    Minor: number;
-    Patch: number;
-    Alpha: number;
-
-    constructor(major: number = 0, minor: number = 0, patch: number = 0, alpha: number = 0) {
-        this.Major = major;
-        this.Minor = minor;
-        this.Patch = patch;
-        this.Alpha = alpha;
-    }
-
-    GreaterThanOrEqualTo(other: FirmwareVersion): boolean {
-        if (this.Major > other.Major) {
-            return true;
-        } else if (this.Major < other.Major) {
-            return false;
-        }
-
-        if (this.Minor > other.Minor) {
-            return true;
-        } else if (this.Minor < other.Minor) {
-            return false;
-        }
-
-        if (this.Patch > other.Patch) {
-            return true;
-        } else if (this.Patch < other.Patch) {
-            return false;
-        }
-
-        if (this.Alpha === 0) {
-            return true;
-        }
-
-        return this.Alpha >= other.Alpha;
-    }
-
-    GreaterThanOrEqualToString(other: string): boolean {
-        const parts = other.split('.');
-
-        if (parts.length < 3) {
-            throw new Error("Invalid version string format. Expected format: 'major.minor.patch[.alpha]'");
-        }
-
-        const major = parseInt(parts[0]);
-        const minor = parseInt(parts[1]);
-        const patch = parseInt(parts[2]);
-        const alpha = parts.length > 3 ? parseInt(parts[3].replace('alpha', '')) : 0;
-
-        return this.GreaterThanOrEqualTo(new FirmwareVersion(major, minor, patch, alpha));
-    }
-}
-
-export enum DisplayType {
-    NONE = 0,
-    MAX7219_32X16 = 1,
-    WS2812_32X16 = 2,
-}
-
-enum displayShowMode {
-    SingleLine = 0,
-    MultiLine = 1,
-}
 
 enum cfgID {
     appVerMajor = 0,
@@ -201,9 +135,9 @@ export class Service {
     async SetMultilineMode(v: boolean): Promise<void> {
         this.multilineMode.value = v;
         if (v) {
-            return this.setCfgVal(cfgID.displayShowMode, displayShowMode.MultiLine)
+            return this.setCfgVal(cfgID.displayShowMode, DisplayShowMode.MultiLine)
         } else {
-            return this.setCfgVal(cfgID.displayShowMode, displayShowMode.SingleLine)
+            return this.setCfgVal(cfgID.displayShowMode, DisplayShowMode.SingleLine)
         }
     }
 
@@ -260,7 +194,7 @@ export class Service {
         this.rtcPinSCL.value = data.getInt8(cfgID.rtcPinSCL);
         this.rtcPinSDA.value = data.getInt8(cfgID.rtcPinSDA);
 
-        this.multilineMode.value = data.getInt8(cfgID.displayShowMode) == displayShowMode.MultiLine;
+        this.multilineMode.value = data.getInt8(cfgID.displayShowMode) == DisplayShowMode.MultiLine;
 
         this.displayMinBrightness.value = data.getInt8(cfgID.displayMinBrightness);
         this.displayMaxBrightness.value = data.getInt8(cfgID.displayMaxBrightness);
