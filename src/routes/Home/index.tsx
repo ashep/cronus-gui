@@ -11,12 +11,12 @@ import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings';
 import EngineeringIcon from '@mui/icons-material/Engineering';
 
 import {Service as BTSvc, ConnStatus as BTConnStatus} from "../../service/Bluetooth";
-import {Service as ConfigSvc} from '../../service/ConfigV1';
+import {Service as ConfigSvc} from '../../service/Config';
 import Bluetooth from '../../components/Bluetooth';
 
 interface Props {
-    btSvc: BTSvc
-    cfgSvc: ConfigSvc
+    bt: BTSvc
+    cfg: ConfigSvc
 }
 
 interface State {
@@ -34,22 +34,22 @@ export default class Home extends React.Component<Props, State> {
             <CssBaseline/>
 
             <Box sx={{mb: 3}}>
-                <Bluetooth path={"/bt"} btSvc={this.props.btSvc} cfgSvc={this.props.cfgSvc} />
+                <Bluetooth path={"/bt"} bt={this.props.bt} cfg={this.props.cfg} />
             </Box>
 
             <Stack direction={"column"} spacing={1}>
-                    {this.props.btSvc.connStatus == BTConnStatus.CONNECTED &&
+                    {this.props.bt.connStatus == BTConnStatus.CONNECTED &&
                         <Button variant={"contained"} startIcon={<WiFiIcon/>} onClick={() => route("/device/wifi")}>
                             WiFi
                         </Button>
                     }
-                    {this.props.btSvc.connStatus == BTConnStatus.CONNECTED &&
+                    {this.props.bt.connStatus == BTConnStatus.CONNECTED &&
                         <Button variant={"contained"} startIcon={<DisplaySettingsIcon/>} onClick={() => route("/device/display")}>
                             Display
                         </Button>
                     }
 
-                    {this.props.btSvc.connStatus == BTConnStatus.CONNECTED && window.location.hash.indexOf("__dev") >= 0 &&
+                    {this.props.bt.connStatus == BTConnStatus.CONNECTED && window.location.hash.indexOf("__dev") >= 0 &&
                         <Button variant={"contained"} startIcon={<EngineeringIcon/>} onClick={() => route("/device/developer")}>
                             Dev area
                         </Button>

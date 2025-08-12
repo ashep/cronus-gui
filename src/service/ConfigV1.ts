@@ -1,6 +1,6 @@
 import {signal, Signal} from "@preact/signals";
 import {ConnStatus as btConnStatus, Service as btSvc} from "./Bluetooth";
-import {FirmwareVersion, DisplayType, DisplayShowMode} from "./Types";
+import {ShowMode, DisplayType, FirmwareVersion} from "./Types";
 
 const chcUUID = 0xff02;
 
@@ -28,6 +28,8 @@ enum cfgID {
 }
 
 export class Service {
+    private readonly fetchIntervalID: number;
+
     private btSvc: btSvc;
 
     private fwVer: Signal<FirmwareVersion> = signal(new FirmwareVersion(0, 0, 0, 0));
@@ -37,7 +39,7 @@ export class Service {
     private rtcPinSCL: Signal<number> = signal(0);
     private rtcPinSDA: Signal<number> = signal(0);
 
-    private multilineMode: Signal<boolean> = signal(false);
+    private displayShowMode: Signal<ShowMode> = signal(ShowMode.SingleLine);
     private displayMinBrightness: Signal<number> = signal(0);
     private displayMaxBrightness: Signal<number> = signal(15);
 
@@ -51,45 +53,27 @@ export class Service {
 
     constructor(btSvc: btSvc) {
         this.btSvc = btSvc;
-        setInterval(this.fetch.bind(this), 1000);
+        this.fetchIntervalID = setInterval(this.fetch.bind(this), 1000);
     }
 
     get FirmwareVersion(): FirmwareVersion {
         return this.fwVer.value;
     }
 
-    get FirmwareVersionString(): string {
-        let s = `${this.fwVer.value.Major}.${this.fwVer.value.Minor}.${this.fwVer.value.Patch}`;
-
-        if (this.fwVer.value.Alpha != 0) {
-            s += `-alpha${this.fwVer.value.Alpha}`;
-        }
-
-        return s;
-    }
-
     get DisplayType(): DisplayType {
         return this.displayType.value;
     }
 
-    get RTPPinSCL(): number {
-        return this.rtcPinSCL.value;
+    get ShowMode(): ShowMode {
+        return this.displayShowMode.value;
     }
 
-    get RTPPinSDA(): number {
-        return this.rtcPinSDA.value;
-    }
-
-    get DisplayMinBrightness(): number {
+    get MinBrightness(): number {
         return this.displayMinBrightness.value;
     }
 
-    get DisplayMaxBrightness(): number {
+    get MaxBrightness(): number {
         return this.displayMaxBrightness.value;
-    }
-
-    get MultilineMode(): boolean {
-        return this.multilineMode.value
     }
 
     get ShowTimeDuration(): number {
@@ -112,16 +96,6 @@ export class Service {
         return this.allowUnstableFirmware.value;
     }
 
-    async SetRTCPinSCL(v: number) {
-        this.rtcPinSCL.value = v;
-        return this.setCfgVal(cfgID.rtcPinSCL, v)
-    }
-
-    async SetRTCPinSDA(v: number) {
-        this.rtcPinSDA.value = v;
-        return this.setCfgVal(cfgID.rtcPinSDA, v)
-    }
-
     async SetDisplayMinBrightness(v: number) {
         this.displayMinBrightness.value = v;
         return this.setCfgVal(cfgID.displayMinBrightness, v)
@@ -132,13 +106,9 @@ export class Service {
         return this.setCfgVal(cfgID.displayMaxBrightness, v)
     }
 
-    async SetMultilineMode(v: boolean): Promise<void> {
-        this.multilineMode.value = v;
-        if (v) {
-            return this.setCfgVal(cfgID.displayShowMode, DisplayShowMode.MultiLine)
-        } else {
-            return this.setCfgVal(cfgID.displayShowMode, DisplayShowMode.SingleLine)
-        }
+    async SetShowMode(v: ShowMode): Promise<void> {
+        this.displayShowMode.value = v;
+        return this.setCfgVal(cfgID.displayShowMode, v)
     }
 
     async SetShowTimeDuration(v: number): Promise<void> {
@@ -175,6 +145,10 @@ export class Service {
         return this.btSvc.write(chcUUID, d);
     }
 
+    public Stop() {
+        clearInterval(this.fetchIntervalID);
+    }
+
     private async fetch() {
         if (this.btSvc.connStatus != btConnStatus.CONNECTED) {
             return;
@@ -194,7 +168,7 @@ export class Service {
         this.rtcPinSCL.value = data.getInt8(cfgID.rtcPinSCL);
         this.rtcPinSDA.value = data.getInt8(cfgID.rtcPinSDA);
 
-        this.multilineMode.value = data.getInt8(cfgID.displayShowMode) == DisplayShowMode.MultiLine;
+        this.displayShowMode.value = data.getInt8(cfgID.displayShowMode) as ShowMode;
 
         this.displayMinBrightness.value = data.getInt8(cfgID.displayMinBrightness);
         this.displayMaxBrightness.value = data.getInt8(cfgID.displayMaxBrightness);

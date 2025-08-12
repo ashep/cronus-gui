@@ -88,13 +88,33 @@ export class Service {
         }
     }
 
-    async read(chcUUID: number): Promise<DataView> {
+    async read(chrcUUID: number): Promise<DataView> {
         if (!this.server || !this.server.connected) {
             this.setConnStatus(ConnStatus.DISCONNECTED);
             throw "not connected";
         }
 
-        return (await this.service?.getCharacteristic(chcUUID)).readValue();
+        let done = false;
+        let exc = null;
+        let data: DataView;
+        for (let i = 0; i < 10 && !done; i++) {
+            try {
+                const chrc = await this.service?.getCharacteristic(chrcUUID);
+                data = await chrc.readValue();
+                done = true;
+                exc = null;
+            } catch (e) {
+                exc = e;
+                console.warn(e);
+                await sleep(100);
+            }
+        }
+
+        if (exc != null) {
+            throw exc;
+        }
+
+        return data;
     }
 
     async write(chcUUID: number, data: BufferSource): Promise<void> {
@@ -103,6 +123,27 @@ export class Service {
             throw "not connected";
         }
 
-        return (await this.service?.getCharacteristic(chcUUID)).writeValueWithoutResponse(data);
+        let done = false;
+        let exc = null;
+        for (let i = 0; i < 10 && !done; i++) {
+            try {
+                const chrc = await this.service?.getCharacteristic(chcUUID);
+                await chrc.writeValueWithoutResponse(data);
+                done = true;
+                exc = null;
+            } catch (e) {
+                exc = e;
+                console.warn(e);
+                await sleep(100);
+            }
+        }
+
+        if (exc != null) {
+            throw exc;
+        }
     }
+}
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }

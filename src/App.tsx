@@ -32,7 +32,7 @@ export default class App extends React.Component <{}, {}> {
     render() {
         return (
             <Router>
-                <Home path={"/device"} btSvc={this.btSvc} cfgSvc={this.cfgSvcV1}/>
+                <Home path={"/device"} bt={this.btSvc} cfg={this.cfgSvc}/>
                 <WiFi path={"/device/wifi"} btConnStatus={this.btSvc.connStatus} wifiSvc={this.wifiSvc}/>
                 <Display path={"/device/display"} btConnStatus={this.btSvc.connStatus} cfg={this.cfgSvc}/>
                 <Developer path={"/device/developer"} btConnStatus={this.btSvc.connStatus} cfg={this.cfgSvc}/>

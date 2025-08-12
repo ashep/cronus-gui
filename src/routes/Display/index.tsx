@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as BTSvc from "../../service/Bluetooth";
 import * as ConfigSvc from "../../service/Config";
+import {ShowMode} from "../../service/Types";
 import {Link, route} from "preact-router";
 
 import Grid from "@mui/material/Grid";
@@ -14,9 +15,7 @@ import Select from "@mui/material/Select";
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
-
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import {ComponentChild} from "preact";
 
 interface Props {
     btConnStatus: BTSvc.ConnStatus
@@ -58,16 +57,17 @@ export default class Display extends React.Component<Props, State> {
                 ?
                 <Box>
                     You're not connected to your Cronus device.
-                    Click <Link  href={"/device"}>here</Link> to connect.
+                    Click <Link href={"/device"}>here</Link> to connect.
                 </Box>
                 :
                 <Stack direction={"column"} spacing={3}>
                     <FormControlLabel
                         label="Multiline mode"
                         control={
-                            <Checkbox checked={this.props.cfg.MultilineMode}
-                                      onChange={(_, v) =>
-                                          this.props.cfg.SetMultilineMode(v)}
+                            <Checkbox checked={this.props.cfg.ShowMode == ShowMode.MultiLine}
+                                      onChange={(_, v) => {
+                                          this.props.cfg.SetShowMode(v ? ShowMode.MultiLine : ShowMode.SingleLine)
+                                      }}
                             />
                         }
                     />
@@ -77,13 +77,12 @@ export default class Display extends React.Component<Props, State> {
                         <Select
                             labelId="min-brightness-duration"
                             id="min-brightness-duration-select"
-                            value={this.props.cfg.DisplayMinBrightness}
+                            value={this.props.cfg.MinBrightness}
                             label="minimum brightness level"
-                            onChange={(e) =>
-                                this.props.cfg.SetDisplayMinBrightness(Number((e.target as HTMLInputElement).value))}
+                            // onChange={(e) => this.props.cfg.SetMinBrightness(Number((e.target as HTMLInputElement).value))}
                         >
                             {brightnessValues.map((opt) => {
-                                    if (opt.value <= this.props.cfg.DisplayMaxBrightness) {
+                                    if (opt.value <= this.props.cfg.MaxBrightness) {
                                         return <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
                                     }
                                 }
@@ -96,10 +95,9 @@ export default class Display extends React.Component<Props, State> {
                         <Select
                             labelId="max-brightness-duration"
                             id="max-brightness-duration-select"
-                            value={this.props.cfg.DisplayMaxBrightness}
+                            value={this.props.cfg.MaxBrightness}
                             label="Maximum brightness level"
-                            onChange={(e) =>
-                                this.props.cfg.SetDisplayMaxBrightness(Number((e.target as HTMLInputElement).value))}
+                            onChange={(e) => this.props.cfg.SetMaxBrightness(Number((e.target as HTMLInputElement).value))}
                         >
                             {brightnessValues.map(opt => (
                                 <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
@@ -107,7 +105,7 @@ export default class Display extends React.Component<Props, State> {
                         </Select>
                     </FormControl>
 
-                    {!this.props.cfg.MultilineMode && (
+                    {this.props.cfg.ShowMode == ShowMode.SingleLine && (
                         <FormControl variant="standard">
                             <InputLabel id="show-time-duration-label">Show time</InputLabel>
                             <Select
@@ -115,8 +113,7 @@ export default class Display extends React.Component<Props, State> {
                                 id="show-time-duration-select"
                                 value={this.props.cfg.ShowTimeDuration}
                                 label="Show time"
-                                onChange={(e) =>
-                                    this.props.cfg.SetShowTimeDuration(Number((e.target as HTMLInputElement).value))}
+                                onChange={(e) => this.props.cfg.SetShowTimeDuration(Number((e.target as HTMLInputElement).value))}
                             >
                                 {durationValues.map(opt => (
                                     <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
@@ -132,8 +129,7 @@ export default class Display extends React.Component<Props, State> {
                             id="show-time-duration-select"
                             value={this.props.cfg.ShowDateDuration}
                             label="Show time"
-                            onChange={(e) =>
-                                this.props.cfg.SetShowDateDuration(Number((e.target as HTMLInputElement).value))}
+                            onChange={(e) => this.props.cfg.SetShowDateDuration(Number((e.target as HTMLInputElement).value))}
                         >
                             {durationValues.map(opt => (
                                 <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
@@ -146,7 +142,7 @@ export default class Display extends React.Component<Props, State> {
                         <Select
                             labelId="show-odr-temp-duration"
                             id="show-odr-duration-select"
-                            value={this.props.cfg.ShowOdrTempDuration}
+                            value={this.props.cfg.ShowOutdoorTempDuration}
                             label="Show outdoor temperature"
                             onChange={(e) =>
                                 this.props.cfg.SetShowOdrTempDuration(Number((e.target as HTMLInputElement).value))}
@@ -157,7 +153,7 @@ export default class Display extends React.Component<Props, State> {
                         </Select>
                     </FormControl>
 
-                    {(!this.props.cfg.MultilineMode && this.props.cfg.FirmwareVersion.GreaterThanOrEqualToString("0.0.1")) && (
+                    {(this.props.cfg.ShowMode == ShowMode.SingleLine && this.props.cfg.FirmwareVersion.GreaterThanString("0.0.1")) && (
                         <FormControl variant="standard">
                             <InputLabel id="show-weather-icon-duration-label">Show weather icon</InputLabel>
                             <Select

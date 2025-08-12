@@ -1,6 +1,7 @@
 import * as ConfigSvcV1 from "./ConfigV1";
 import * as ConfigSvcV2 from "./ConfigV2";
-import {FirmwareVersion, DisplayType} from "./Types";
+import {FirmwareVersion, DisplayType, ShowMode} from "./Types";
+import {Signal} from "@preact/signals";
 
 export class Service {
     private v1: ConfigSvcV1.Service;
@@ -14,27 +15,28 @@ export class Service {
     }
 
     get FirmwareVersion(): FirmwareVersion {
+        let v: FirmwareVersion;
+
         if (!this.useV2) {
-            return this.v1.FirmwareVersion;
+            v = this.v1.FirmwareVersion;
+            if (v.GreaterThanString("0.0.1")) {
+                console.log("config: switched to v2");
+                this.useV2 = true;
+                this.v1.Stop();
+            }
+        } else {
+            v = this.v2.FirmwareVersion;
         }
-        return this.v2.FirmwareVersion;
+
+        return v;
     }
 
     get FirmwareVersionString(): string {
-        let fwVer: FirmwareVersion;
-
-        if (!this.useV2) {
-            fwVer = this.v1.FirmwareVersion;
-        } else {
-            fwVer = this.v2.FirmwareVersion;
+        let v = this.FirmwareVersion;
+        let s = `${v.Major}.${v.Minor}.${v.Patch}`;
+        if (v.Alpha != 0) {
+            s += `-alpha${v.Alpha}`;
         }
-
-        let s = `${fwVer.Major}.${fwVer.Minor}.${fwVer.Patch}`;
-
-        if (fwVer.Alpha != 0) {
-            s += `-alpha${fwVer.Alpha}`;
-        }
-
         return s;
     }
 
@@ -45,39 +47,25 @@ export class Service {
         return this.v2.DisplayType;
     }
 
-    get RTPPinSCL(): number {
+    get ShowMode(): ShowMode {
         if (!this.useV2) {
-            return this.v1.RTPPinSCL;
+            return this.v1.ShowMode;
         }
-        return this.v2.RTPPinSCL;
+        return this.v2.ShowMode;
     }
 
-    get RTPPinSDA(): number {
+    get MinBrightness(): number {
         if (!this.useV2) {
-            return this.v1.RTPPinSDA;
+            return this.v1.MinBrightness;
         }
-        return this.v2.RTPPinSDA;
+        return this.v2.MinBrightness;
     }
 
-    get DisplayMinBrightness(): number {
+    get MaxBrightness(): number {
         if (!this.useV2) {
-            return this.v1.DisplayMinBrightness;
+            return this.v1.MaxBrightness;
         }
-        return this.v2.DisplayMinBrightness;
-    }
-
-    get DisplayMaxBrightness(): number {
-        if (!this.useV2) {
-            return this.v1.DisplayMaxBrightness;
-        }
-        return this.v2.DisplayMaxBrightness;
-    }
-
-    get MultilineMode(): boolean {
-        if (!this.useV2) {
-            return this.v1.MultilineMode;
-        }
-        return this.v2.MultilineMode;
+        return this.v2.MaxBrightness;
     }
 
     get ShowTimeDuration(): number {
@@ -94,18 +82,18 @@ export class Service {
         return this.v2.ShowDateDuration;
     }
 
+    get ShowOutdoorTempDuration(): number {
+        if (!this.useV2) {
+            return this.v1.ShowOdrTempDuration;
+        }
+        return this.v2.ShowOutdoorTempDuration;
+    }
+
     get ShowWeatherIconDuration(): number {
         if (!this.useV2) {
             return this.v1.ShowWeatherIconDuration;
         }
         return this.v2.ShowWeatherIconDuration;
-    }
-
-    get ShowOdrTempDuration(): number {
-        if (!this.useV2) {
-            return this.v1.ShowOdrTempDuration;
-        }
-        return this.v2.ShowOdrTempDuration;
     }
 
     get AllowUnstableFirmware(): boolean {
@@ -115,39 +103,25 @@ export class Service {
         return this.v2.AllowUnstableFirmware;
     }
 
-    async SetRTCPinSCL(v: number) {
-        if (!this.useV2) {
-            return this.v1.SetRTCPinSCL(v);
-        }
-        return this.v2.SetRTCPinSCL(v);
-    }
-
-    async SetRTCPinSDA(v: number) {
-        if (!this.useV2) {
-            return this.v1.SetRTCPinSDA(v);
-        }
-        return this.v2.SetRTCPinSDA(v);
-    }
-
-    async SetDisplayMinBrightness(v: number) {
+    async SetMinBrightness(v: number) {
         if (!this.useV2) {
             return this.v1.SetDisplayMinBrightness(v);
         }
-        return this.v2.SetDisplayMinBrightness(v);
+        return this.v2.SetMinBrightness(v);
     }
 
-    async SetDisplayMaxBrightness(v: number) {
+    async SetMaxBrightness(v: number) {
         if (!this.useV2) {
             return this.v1.SetDisplayMaxBrightness(v);
         }
-        return this.v2.SetDisplayMaxBrightness(v);
+        return this.v2.SetMaxBrightness(v);
     }
 
-    async SetMultilineMode(v: boolean): Promise<void> {
+    async SetShowMode(v: ShowMode): Promise<void> {
         if (!this.useV2) {
-            return this.v1.SetMultilineMode(v);
+            return this.v1.SetShowMode(v);
         }
-        return this.v2.SetMultilineMode(v);
+        return this.v2.SetShowMode(v);
     }
 
     async SetShowTimeDuration(v: number): Promise<void> {
@@ -168,7 +142,7 @@ export class Service {
         if (!this.useV2) {
             return this.v1.SetShowOdrTempDuration(v);
         }
-        return this.v2.SetShowOdrTempDuration(v);
+        return this.v2.SetShowOutdoorTempDuration(v);
     }
 
     async SetShowWeatherIconDuration(v: number): Promise<void> {

@@ -11,10 +11,6 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import Button from "@mui/material/Button";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
 
 interface Props {
     btConnStatus: BTSvc.ConnStatus
@@ -51,34 +47,6 @@ export default class Misc extends React.Component<Props, State> {
                             />
                         }
                     />
-
-                    <FormControl variant="standard">
-                        <InputLabel id="ds3231-pin-scl">DS3231 SCL</InputLabel>
-                        <Select
-                            labelId="ds3231-pin-scl"
-                            id="ds3231-pin-scl-select"
-                            value={this.props.cfg.RTPPinSCL}
-                            label="ds3231-pin-scl"
-                            onChange={(_, v) => this.props.cfg.SetRTCPinSCL(v.props.value)}
-                        >
-                            <MenuItem key={38} value={38}>{38}</MenuItem>
-                            <MenuItem key={39} value={39}>{39}</MenuItem>
-                        </Select>
-                    </FormControl>
-
-                    <FormControl variant="standard">
-                        <InputLabel id="ds3231-pin-scl">DS3231 SDA</InputLabel>
-                        <Select
-                            labelId="ds3231-pin-scl"
-                            id="ds3231-pin-scl-select"
-                            value={this.props.cfg.RTPPinSDA}
-                            label="ds3231-pin-scl"
-                            onChange={(_, v) => this.props.cfg.SetRTCPinSDA(v.props.value)}
-                        >
-                            <MenuItem key={38} value={38}>{38}</MenuItem>
-                            <MenuItem key={39} value={39}>{39}</MenuItem>
-                        </Select>
-                    </FormControl>
 
                     <Button variant={"outlined"} startIcon={<ArrowBackIcon/>} onClick={() => route("/device/#__dev")}>
                         Back
