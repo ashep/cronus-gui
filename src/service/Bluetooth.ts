@@ -1,4 +1,5 @@
 import {signal, Signal} from "@preact/signals";
+import {random} from "nanoid";
 
 export enum ConnStatus {
     DISCONNECTED,
@@ -11,11 +12,10 @@ export class Service {
     private device?: BluetoothDevice;
     private server?: BluetoothRemoteGATTServer;
     private service?: BluetoothRemoteGATTService;
-
     private cnStatus: Signal<ConnStatus>;
-
     private onConnect?: () => void;
     private onDisconnect?: () => void;
+    private locked: boolean = false;
 
     get connectedDeviceName(): string | null {
         return this.server?.device?.name
@@ -94,24 +94,22 @@ export class Service {
             throw "not connected";
         }
 
-        let done = false;
-        let exc = null;
         let data: DataView;
-        for (let i = 0; i < 10 && !done; i++) {
+        for (let i = 0; i < 10; i++) {
+            if (this.locked) {
+                await sleep(randInt(100, 500));
+                continue;
+            }
+
             try {
+                this.locked = true;
                 const chrc = await this.service?.getCharacteristic(chrcUUID);
                 data = await chrc.readValue();
-                done = true;
-                exc = null;
-            } catch (e) {
-                exc = e;
-                console.warn(e);
-                await sleep(100);
+            } finally {
+                this.locked = false;
             }
-        }
 
-        if (exc != null) {
-            throw exc;
+            break;
         }
 
         return data;
@@ -123,27 +121,31 @@ export class Service {
             throw "not connected";
         }
 
-        let done = false;
-        let exc = null;
-        for (let i = 0; i < 10 && !done; i++) {
+        for (let i = 0; i < 10; i++) {
+            if (this.locked) {
+                await sleep(randInt(100, 500));
+                continue;
+            }
+
             try {
+                this.locked = true;
                 const chrc = await this.service?.getCharacteristic(chcUUID);
                 await chrc.writeValueWithoutResponse(data);
-                done = true;
-                exc = null;
-            } catch (e) {
-                exc = e;
-                console.warn(e);
-                await sleep(100);
+            } finally {
+                this.locked = false;
             }
-        }
 
-        if (exc != null) {
-            throw exc;
+            break;
         }
     }
 }
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function randInt(min: number, max: number): number {
+    min = Math.ceil(min); // Ensure min is an integer
+    max = Math.floor(max); // Ensure max is an integer
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }

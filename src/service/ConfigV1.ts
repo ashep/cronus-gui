@@ -11,10 +11,6 @@ enum cfgID {
     appVerAlpha = 3,
 
     displayType = 30,
-
-    rtcPinSCL = 70,
-    rtcPinSDA = 71,
-
     displayShowMode = 128,
     displayMinBrightness = 129,
     displayMaxBrightness = 130,
@@ -28,21 +24,14 @@ enum cfgID {
 }
 
 export class Service {
-    private readonly fetchIntervalID: number;
-
+    private fetchIntervalID: number;
+    private fetchCount: number;
     private btSvc: btSvc;
-
     private fwVer: Signal<FirmwareVersion> = signal(new FirmwareVersion(0, 0, 0, 0));
-
     private displayType: Signal<DisplayType> = signal(DisplayType.NONE);
-
-    private rtcPinSCL: Signal<number> = signal(0);
-    private rtcPinSDA: Signal<number> = signal(0);
-
     private displayShowMode: Signal<ShowMode> = signal(ShowMode.SingleLine);
     private displayMinBrightness: Signal<number> = signal(0);
     private displayMaxBrightness: Signal<number> = signal(15);
-
     private showTimeDuration: Signal<number> = signal(30);
     private showDateDuration: Signal<number> = signal(5);
     private showDOWDuration: Signal<number> = signal(5);
@@ -54,6 +43,15 @@ export class Service {
     constructor(btSvc: btSvc) {
         this.btSvc = btSvc;
         this.fetchIntervalID = setInterval(this.fetch.bind(this), 1000);
+        this.fetchCount = 0;
+    }
+
+    get IsStopped(): boolean {
+        return this.fetchIntervalID === undefined || this.fetchIntervalID === 0;
+    }
+
+    get FetchCount(): number {
+        return this.fetchCount;
     }
 
     get FirmwareVersion(): FirmwareVersion {
@@ -121,7 +119,7 @@ export class Service {
         return this.setCfgVal(cfgID.showDateDuration, v)
     }
 
-    async SetShowOdrTempDuration(v: number): Promise<void> {
+    async SetShowOutdoorTempDuration(v: number): Promise<void> {
         this.showOdrTempDuration.value = v;
         return this.setCfgVal(cfgID.showOdrTempDuration, v)
     }
@@ -146,7 +144,12 @@ export class Service {
     }
 
     public Stop() {
+        if (this.IsStopped) {
+            return
+        }
         clearInterval(this.fetchIntervalID);
+        this.fetchIntervalID = undefined;
+        console.log("V1 client has been stopped");
     }
 
     private async fetch() {
@@ -154,7 +157,18 @@ export class Service {
             return;
         }
 
-        let data = await this.btSvc.read(chcUUID);
+        let data: DataView;
+        try {
+            data = await this.btSvc.read(chcUUID);
+        } catch (e) {
+            this.fetchCount++;
+            if (e.toString().toLowerCase().includes('no characteristics matching uuid 0000ff02')) {
+                this.Stop();
+            }
+            throw e;
+        }
+
+        this.fetchCount++;
 
         this.fwVer.value = new FirmwareVersion(
             data.getInt8(cfgID.appVerMajor),
@@ -164,15 +178,9 @@ export class Service {
         );
 
         this.displayType.value = data.getInt8(cfgID.displayType);
-
-        this.rtcPinSCL.value = data.getInt8(cfgID.rtcPinSCL);
-        this.rtcPinSDA.value = data.getInt8(cfgID.rtcPinSDA);
-
         this.displayShowMode.value = data.getInt8(cfgID.displayShowMode) as ShowMode;
-
         this.displayMinBrightness.value = data.getInt8(cfgID.displayMinBrightness);
         this.displayMaxBrightness.value = data.getInt8(cfgID.displayMaxBrightness);
-
         this.showTimeDuration.value = data.getInt8(cfgID.showTimeDuration);
         this.showDateDuration.value = data.getInt8(cfgID.showDateDuration);
         this.showDOWDuration.value = data.getInt8(cfgID.showDOWDuration);

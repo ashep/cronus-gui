@@ -22,6 +22,10 @@ export class FirmwareVersion {
         this.Alpha = alpha;
     }
 
+    public get String(): string {
+        return `${this.Major}.${this.Minor}.${this.Patch}${this.Alpha !== 0 ? `-alpha${this.Alpha}` : ''}`;
+    }
+
     SetFromString(str: string): FirmwareVersion {
         const parts = str.split('.');
 

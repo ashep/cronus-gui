@@ -34,26 +34,40 @@ export default class Home extends React.Component<Props, State> {
             <CssBaseline/>
 
             <Box sx={{mb: 3}}>
-                <Bluetooth path={"/bt"} bt={this.props.bt} cfg={this.props.cfg} />
+                <Bluetooth path={"/bt"} bt={this.props.bt} cfg={this.props.cfg}/>
             </Box>
 
             <Stack direction={"column"} spacing={1}>
-                    {this.props.bt.connStatus == BTConnStatus.CONNECTED &&
-                        <Button variant={"contained"} startIcon={<WiFiIcon/>} onClick={() => route("/device/wifi")}>
-                            WiFi
-                        </Button>
-                    }
-                    {this.props.bt.connStatus == BTConnStatus.CONNECTED &&
-                        <Button variant={"contained"} startIcon={<DisplaySettingsIcon/>} onClick={() => route("/device/display")}>
-                            Display
-                        </Button>
-                    }
+                {this.props.bt.connStatus == BTConnStatus.CONNECTED &&
+                    <Button disabled={this.props.cfg.FirmwareVersionString == "0.0.0"}
+                            variant={"contained"}
+                            startIcon={<WiFiIcon/>}
+                            onClick={() => route("/device/wifi")}
+                    >
+                        WiFi
+                    </Button>
+                }
+                {this.props.bt.connStatus == BTConnStatus.CONNECTED &&
+                    <Button
+                        disabled={this.props.cfg.FirmwareVersionString == "0.0.0"}
+                        variant={"contained"}
+                        startIcon={<DisplaySettingsIcon/>}
+                        onClick={() => route("/device/display")}
+                    >
+                        Display
+                    </Button>
+                }
 
-                    {this.props.bt.connStatus == BTConnStatus.CONNECTED && window.location.hash.indexOf("__dev") >= 0 &&
-                        <Button variant={"contained"} startIcon={<EngineeringIcon/>} onClick={() => route("/device/developer")}>
-                            Dev area
-                        </Button>
-                    }
+                {this.props.bt.connStatus == BTConnStatus.CONNECTED && window.location.hash.indexOf("__dev") >= 0 &&
+                    <Button
+                        disabled={this.props.cfg.FirmwareVersionString == "0.0.0"}
+                        variant={"contained"}
+                        startIcon={<EngineeringIcon/>}
+                        onClick={() => route("/device/developer")}
+                    >
+                        Dev area
+                    </Button>
+                }
             </Stack>
         </Grid>;
     }

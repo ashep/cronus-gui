@@ -27,6 +27,8 @@ interface State {
 
 const durationValues = [
     {value: 0, label: "Don't show"},
+    {value: 1, label: '1 sec'},
+    {value: 3, label: '3 sec'},
     {value: 5, label: '5 sec'},
     {value: 15, label: '15 sec'},
     {value: 30, label: '30 sec'},
@@ -37,8 +39,11 @@ const durationValues = [
 const brightnessValues = [
     {value: 0, label: "1%"},
     {value: 3, label: "25%"},
+    {value: 5, label: "37%"},
     {value: 7, label: "50%"},
+    {value: 9, label: "63%"},
     {value: 11, label: "75%"},
+    {value: 13, label: "87%"},
     {value: 15, label: "100%"},
 ]
 
@@ -79,7 +84,7 @@ export default class Display extends React.Component<Props, State> {
                             id="min-brightness-duration-select"
                             value={this.props.cfg.MinBrightness}
                             label="minimum brightness level"
-                            // onChange={(e) => this.props.cfg.SetMinBrightness(Number((e.target as HTMLInputElement).value))}
+                            onChange={(e) => this.props.cfg.SetMinBrightness(Number((e.target as HTMLInputElement).value))}
                         >
                             {brightnessValues.map((opt) => {
                                     if (opt.value <= this.props.cfg.MaxBrightness) {
@@ -144,8 +149,7 @@ export default class Display extends React.Component<Props, State> {
                             id="show-odr-duration-select"
                             value={this.props.cfg.ShowOutdoorTempDuration}
                             label="Show outdoor temperature"
-                            onChange={(e) =>
-                                this.props.cfg.SetShowOdrTempDuration(Number((e.target as HTMLInputElement).value))}
+                            onChange={(e) => this.props.cfg.SetShowOutdoorTempDuration(Number((e.target as HTMLInputElement).value))}
                         >
                             {durationValues.map(opt => (
                                 <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
@@ -161,8 +165,7 @@ export default class Display extends React.Component<Props, State> {
                                 id="show-weather-icon-select"
                                 value={this.props.cfg.ShowWeatherIconDuration}
                                 label="Show weather icon"
-                                onChange={(e) =>
-                                    this.props.cfg.SetShowWeatherIconDuration(Number((e.target as HTMLInputElement).value))}
+                                onChange={(e) => this.props.cfg.SetShowWeatherIconDuration(Number((e.target as HTMLInputElement).value))}
                             >
                                 {durationValues.map(opt => (
                                     <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>

@@ -26,7 +26,7 @@ export default class App extends React.Component <{}, {}> {
         this.wifiSvc = new WiFiSvc.Service(this.btSvc);
         this.cfgSvcV1 = new ConfigV1.Service(this.btSvc);
         this.cfgSvcV2 = new ConfigV2.Service(this.btSvc);
-        this.cfgSvc = new Config.Service(this.cfgSvcV1, this.cfgSvcV2);
+        this.cfgSvc = new Config.Service(this.btSvc, this.cfgSvcV1, this.cfgSvcV2);
     }
 
     render() {

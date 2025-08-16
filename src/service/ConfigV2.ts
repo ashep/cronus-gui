@@ -1,6 +1,7 @@
 import {signal, Signal} from "@preact/signals";
 import {ConnStatus as btConnStatus, Service as btSvc} from "./Bluetooth";
 import {ShowMode, FirmwareVersion, DisplayType} from "./Types";
+import {debug} from "yaml/util";
 
 enum chrcUUID {
     firmwareVersion = 0xf000,
@@ -20,7 +21,8 @@ enum chrcUUID {
 }
 
 export class Service {
-    private btSvc: btSvc;
+    private bt: btSvc;
+    private debug = false;
 
     private firmwareVersion: Signal<FirmwareVersion> = signal(new FirmwareVersion(0, 0, 0, 0));
     private displayType: Signal<DisplayType> = signal(DisplayType.NONE);
@@ -33,121 +35,79 @@ export class Service {
     private allowUnstableFirmware: Signal<boolean> = signal(false);
     private showWeatherIconDuration: Signal<number> = signal(0);
 
-    // Contains characteristic UUIDs which values are not fetched from the device yet
-    private readCache: Record<number, boolean> = {};
-
     constructor(btSvc: btSvc) {
-        this.btSvc = btSvc;
+        this.bt = btSvc;
+    }
+
+    public async Start() {
+        await this.readCharacteristic(chrcUUID.firmwareVersion).then(v => {
+            const newVerStr = new TextDecoder().decode(v);
+            this.firmwareVersion.value = new FirmwareVersion().SetFromString(newVerStr);
+        });
+        await this.readCharacteristic(chrcUUID.display0Type).then(v => {
+            this.displayType.value = v.getUint8(0) as DisplayType;
+        })
+        await this.readCharacteristic(chrcUUID.showMode).then(v => {
+            this.showMode.value = v.getUint8(0) as ShowMode;
+        })
+        await this.readCharacteristic(chrcUUID.minBrightness).then(v => {
+            this.minBrightness.value = v.getUint8(0);
+        })
+        await this.readCharacteristic(chrcUUID.maxBrightness).then(v => {
+            this.maxBrightness.value = v.getUint8(0);
+        })
+        await this.readCharacteristic(chrcUUID.showTimeDuration).then(v => {
+            this.showTimeDuration.value = v.getUint8(0);
+        })
+        await this.readCharacteristic(chrcUUID.showDateDuration).then(v => {
+            this.showDateDuration.value = v.getUint8(0);
+        })
+        await this.readCharacteristic(chrcUUID.showOutdoorTempDuration).then(v => {
+            this.showOutdoorTempDuration.value = v.getUint8(0);
+        })
+        await this.readCharacteristic(chrcUUID.allowUnstableFirmware).then(v => {
+            this.allowUnstableFirmware.value = v.getUint8(0) != 0;
+        })
     }
 
     get FirmwareVersion(): FirmwareVersion {
-        this.readCharacteristic(chrcUUID.firmwareVersion).then(v => {
-            const newVerStr = new TextDecoder().decode(v);
-            const newVer = new FirmwareVersion().SetFromString(newVerStr);
-            if (!this.firmwareVersion.value.Equals(newVer)) {
-                this.firmwareVersion.value = newVer;
-            }
-        });
         return this.firmwareVersion.value;
     }
 
     get DisplayType(): DisplayType {
-        this.readCharacteristic(chrcUUID.display0Type).then(v => {
-            const newDisplayType = v.getUint8(0) as DisplayType;
-            if (this.displayType.value != newDisplayType) {
-                this.displayType.value = newDisplayType;
-            }
-        })
-
         return this.displayType.value;
     }
 
     get ShowMode(): ShowMode {
-        if (this.readCache[chrcUUID.showMode]) {
-            return this.showMode.value;
-        }
-        this.readCharacteristic(chrcUUID.showMode).then(v => {
-            this.showMode.value = v.getUint8(0) as ShowMode;
-        })
         return this.showMode.value;
     }
 
     get MinBrightness(): number {
-        if (this.readCache[chrcUUID.minBrightness]) {
-            return this.minBrightness.value;
-        }
-        this.readCharacteristic(chrcUUID.minBrightness).then(v => {
-            this.minBrightness.value = v.getUint8(0);
-        })
         return this.minBrightness.value;
     }
 
     get MaxBrightness(): number {
-        if (this.readCache[chrcUUID.maxBrightness]) {
-            return this.maxBrightness.value;
-        }
-        this.readCharacteristic(chrcUUID.maxBrightness).then(v => {
-            this.maxBrightness.value = v.getUint8(0);
-        })
         return this.maxBrightness.value;
     }
 
     get ShowTimeDuration(): number {
-        if (this.readCache[chrcUUID.showTimeDuration]) {
-            return this.showTimeDuration.value;
-        }
-        this.readCharacteristic(chrcUUID.showTimeDuration).then(v => {
-            this.showTimeDuration.value = v.getUint8(0);
-        })
         return this.showTimeDuration.value;
     }
 
     get ShowDateDuration(): number {
-        if (this.readCache[chrcUUID.showDateDuration]) {
-            return this.showDateDuration.value;
-        }
-        this.readCharacteristic(chrcUUID.showDateDuration).then(v => {
-            this.showDateDuration.value = v.getUint8(0);
-        })
         return this.showDateDuration.value;
     }
 
     get ShowOutdoorTempDuration(): number {
-        if (this.readCache[chrcUUID.showOutdoorTempDuration]) {
-            return this.showOutdoorTempDuration.value;
-        }
-        this.readCharacteristic(chrcUUID.showOutdoorTempDuration).then(v => {
-            this.showOutdoorTempDuration.value = v.getUint8(0);
-        })
         return this.showOutdoorTempDuration.value;
     }
 
     get AllowUnstableFirmware(): boolean {
-        if (this.readCache[chrcUUID.allowUnstableFirmware]) {
-            return this.allowUnstableFirmware.value;
-        }
-        this.readCharacteristic(chrcUUID.allowUnstableFirmware).then(v => {
-            this.allowUnstableFirmware.value = v.getUint8(0) != 0;
-        })
         return this.allowUnstableFirmware.value;
     }
 
     get ShowWeatherIconDuration(): number {
-        if (this.readCache[chrcUUID.showWeatherIconDuration]) {
-            return this.showWeatherIconDuration.value;
-        }
-        this.readCharacteristic(chrcUUID.showWeatherIconDuration).then(v => {
-            this.showWeatherIconDuration.value = v.getUint8(0);
-        })
         return this.showWeatherIconDuration.value;
-    }
-
-    async SetRTCPinSCL(v: number) {
-        // TODO
-    }
-
-    async SetRTCPinSDA(v: number) {
-        // TODO
     }
 
     async SetShowMode(v: ShowMode): Promise<void> {
@@ -191,14 +151,15 @@ export class Service {
     }
 
     private async readCharacteristic(uuid: chrcUUID) {
-        if (this.btSvc.connStatus != btConnStatus.CONNECTED) {
+        if (this.bt.connStatus != btConnStatus.CONNECTED) {
             return;
         }
 
-        let data = await this.btSvc.read(uuid);
-        this.readCache[uuid] = true;
+        let data = await this.bt.read(uuid);
 
-        console.log("read", uuid, data);
+        if (this.debug) {
+            console.log("read", "0x" + uuid.toString(16), data);
+        }
 
         return data;
     }
@@ -214,8 +175,10 @@ export class Service {
             throw "unexpected type " + typeof val;
         }
 
-        console.log("write", uuid, data);
+        if (this.debug) {
+            console.log("write", "0x" + uuid.toString(16), data);
+        }
 
-        return this.btSvc.write(uuid, data);
+        return this.bt.write(uuid, data);
     }
 }
