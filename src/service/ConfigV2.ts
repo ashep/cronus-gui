@@ -24,7 +24,7 @@ enum chrcUUID {
 
 export class Service {
     private bt: btSvc;
-    private debug = true;
+    private debug = process.env.DEBUG === "true";
 
     private firmwareVersion: Signal<FirmwareVersion> = signal(new FirmwareVersion(0, 0, 0, 0));
     private displayType: Signal<DisplayType> = signal(DisplayType.NONE);
