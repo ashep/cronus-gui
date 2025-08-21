@@ -82,6 +82,18 @@ export class Service {
         return this.useV2 ? this.v2.ShowDateDuration : this.v1.ShowDateDuration;
     }
 
+    get LocationName(): string {
+        return this.v2.LocationName;
+    }
+
+    get LocationLat(): number {
+        return this.v2.LocationLat;
+    }
+
+    get LocationLng(): number {
+        return this.v2.LocationLng;
+    }
+
     get ShowOutdoorTempDuration(): number {
         if (!this.useV2) {
             return this.v1.ShowOdrTempDuration;
@@ -127,5 +139,26 @@ export class Service {
 
     async SetAllowUnstableFirmware(v: boolean): Promise<void> {
         return this.useV2 ? this.v2.SetAllowUnstableFirmware(v) : this.v1.SetAllowUnstableFirmware(v);
+    }
+
+    async SetLocationName(v: string): Promise<void> {
+        if (!this.useV2) {
+            throw new Error("Location is only supported in Config V2");
+        }
+        return this.v2.SetLocationName(v);
+    }
+
+    async SetLocationLat(v: number): Promise<void> {
+        if (!this.useV2) {
+            throw new Error("Location is only supported in Config V2");
+        }
+        return this.v2.SetLocationLat(v);
+    }
+
+    async SetLocationLng(v: number): Promise<void> {
+        if (!this.useV2) {
+            throw new Error("Location is only supported in Config V2");
+        }
+        return this.v2.SetLocationLng(v);
     }
 }

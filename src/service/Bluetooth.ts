@@ -1,5 +1,4 @@
 import {signal, Signal} from "@preact/signals";
-import {random} from "nanoid";
 
 export enum ConnStatus {
     DISCONNECTED,
