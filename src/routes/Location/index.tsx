@@ -116,7 +116,7 @@ export default class Home extends React.Component<Props, State> {
 
     private async fetchPlaceInfo(placeId: string): Promise<GooglePlaceInfo> {
         if (!placeId) {
-            return;
+            throw new Error("fetchPlaceInfo called with falsy placeId");
         }
 
         const res = await fetch("https://places.googleapis.com/v1/places/" + placeId, {
