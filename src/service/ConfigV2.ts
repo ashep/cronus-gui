@@ -24,7 +24,7 @@ enum chrcUUID {
 
 export class Service {
     private bt: btSvc;
-    private debug = process.env.DEBUG === "true";
+    private debug: boolean = false;
 
     private firmwareVersion: Signal<FirmwareVersion> = signal(new FirmwareVersion(0, 0, 0, 0));
     private displayType: Signal<DisplayType> = signal(DisplayType.NONE);
@@ -76,15 +76,18 @@ export class Service {
         await this.readCharacteristic(chrcUUID.showWeatherIconDuration).then(v => {
             this.showWeatherIconDuration.value = v.getUint8(0);
         })
-        await this.readCharacteristic(chrcUUID.locationName).then(v => {
-            this.locationName.value = new TextDecoder("utf-8").decode(v);
-        })
-        await this.readCharacteristic(chrcUUID.locationLat).then(v => {
-            this.locationLat.value = v.getFloat32(0);
-        })
-        await this.readCharacteristic(chrcUUID.locationLng).then(v => {
-            this.locationLng.value = v.getFloat32(0);
-        })
+
+        if (this.firmwareVersion.value.GreaterThanString("0.0.2")) {
+            await this.readCharacteristic(chrcUUID.locationName).then(v => {
+                this.locationName.value = new TextDecoder("utf-8").decode(v);
+            })
+            await this.readCharacteristic(chrcUUID.locationLat).then(v => {
+                this.locationLat.value = v.getFloat32(0);
+            })
+            await this.readCharacteristic(chrcUUID.locationLng).then(v => {
+                this.locationLng.value = v.getFloat32(0);
+            })
+        }
     }
 
     get FirmwareVersion(): FirmwareVersion {
