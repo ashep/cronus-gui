@@ -18,11 +18,13 @@ enum chrcUUID {
     allowUnstableFirmware = 0xf018,
     showWeatherIconDuration = 0xf019,
     locationName = 0xf01a,
+    locationLat = 0xf01b,
+    locationLng = 0xf01c,
 }
 
 export class Service {
     private bt: btSvc;
-    private debug = false;
+    private debug = true;
 
     private firmwareVersion: Signal<FirmwareVersion> = signal(new FirmwareVersion(0, 0, 0, 0));
     private displayType: Signal<DisplayType> = signal(DisplayType.NONE);
@@ -34,6 +36,9 @@ export class Service {
     private showOutdoorTempDuration: Signal<number> = signal(0);
     private allowUnstableFirmware: Signal<boolean> = signal(false);
     private showWeatherIconDuration: Signal<number> = signal(0);
+    private locationName: Signal<string> = signal("");
+    private locationLat: Signal<number> = signal(0);
+    private locationLng: Signal<number> = signal(0);
 
     constructor(btSvc: btSvc) {
         this.bt = btSvc;
@@ -67,6 +72,18 @@ export class Service {
         })
         await this.readCharacteristic(chrcUUID.allowUnstableFirmware).then(v => {
             this.allowUnstableFirmware.value = v.getUint8(0) != 0;
+        })
+        await this.readCharacteristic(chrcUUID.showWeatherIconDuration).then(v => {
+            this.showWeatherIconDuration.value = v.getUint8(0);
+        })
+        await this.readCharacteristic(chrcUUID.locationName).then(v => {
+            this.locationName.value = new TextDecoder("utf-8").decode(v);
+        })
+        await this.readCharacteristic(chrcUUID.locationLat).then(v => {
+            this.locationLat.value = v.getFloat32(0);
+        })
+        await this.readCharacteristic(chrcUUID.locationLng).then(v => {
+            this.locationLng.value = v.getFloat32(0);
         })
     }
 
@@ -110,6 +127,18 @@ export class Service {
         return this.showWeatherIconDuration.value;
     }
 
+    get LocationName(): string {
+        return this.locationName.value;
+    }
+
+    get LocationLat(): number {
+        return this.locationLat.value;
+    }
+
+    get LocationLng(): number {
+        return this.locationLng.value;
+    }
+
     async SetShowMode(v: ShowMode): Promise<void> {
         await this.writeCharacteristic(chrcUUID.showMode, v);
         this.showMode.value = v;
@@ -150,6 +179,21 @@ export class Service {
         this.showWeatherIconDuration.value = v;
     }
 
+    async SetLocationName(v: string): Promise<void> {
+        await this.writeCharacteristic(chrcUUID.locationName, v);
+        this.locationName.value = v;
+    }
+
+    async SetLocationLat(v: number): Promise<void> {
+        await this.writeCharacteristic(chrcUUID.locationLat, v);
+        this.locationLat.value = v;
+    }
+
+    async SetLocationLng(v: number): Promise<void> {
+        await this.writeCharacteristic(chrcUUID.locationLng, v);
+        this.locationLng.value = v;
+    }
+
     private async readCharacteristic(uuid: chrcUUID) {
         if (this.bt.connStatus != btConnStatus.CONNECTED) {
             return;
@@ -168,7 +212,13 @@ export class Service {
         let data: BufferSource;
 
         if (typeof val === 'number') {
-            data = new Uint8Array([val]);
+            if (Number.isFinite(val) && Number.isInteger(val)) {
+                data = new Uint8Array([val]);
+            } else if (Number.isFinite(val) && !Number.isInteger(val)) {
+                data = new Float32Array([val]);
+            } else {
+                throw new Error(`${val} is not a finite number`);
+            }
         } else if (typeof val === 'string') {
             data = new TextEncoder().encode(val);
         } else {

@@ -67,11 +67,13 @@ export class FirmwareVersion {
             return false;
         }
 
+        console.log(this, other);
+
         // alpha == 0 is considered stable, and stable versions are greater than alpha versions
-        if (this.Alpha !== 0 && this.Alpha != 0) {
+        if (this.Alpha !== 0 && other.Alpha != 0) {
             return this.Alpha > other.Alpha;
         } else if(this.Alpha == 0 && other.Alpha != 0) {
-            return true;
+            return false;
         }
 
         return false;

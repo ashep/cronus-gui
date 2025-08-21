@@ -9,10 +9,12 @@ import Button from "@mui/material/Button";
 import WiFiIcon from "@mui/icons-material/Wifi";
 import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings';
 import EngineeringIcon from '@mui/icons-material/Engineering';
+import LocationIcon from "@mui/icons-material/LocationOn";
 
 import {Service as BTSvc, ConnStatus as BTConnStatus} from "../../service/Bluetooth";
 import {Service as ConfigSvc} from '../../service/Config';
 import Bluetooth from '../../components/Bluetooth';
+import {useTranslation} from "react-i18next";
 
 interface Props {
     bt: BTSvc
@@ -24,6 +26,8 @@ interface State {
 
 export default class Home extends React.Component<Props, State> {
     render() {
+        const {t} = useTranslation();
+
         return <Grid container
                      spacing={0}
                      direction="column"
@@ -44,9 +48,10 @@ export default class Home extends React.Component<Props, State> {
                             startIcon={<WiFiIcon/>}
                             onClick={() => route("/device/wifi")}
                     >
-                        WiFi
+                        {t("wifi")}
                     </Button>
                 }
+
                 {this.props.bt.connStatus == BTConnStatus.CONNECTED &&
                     <Button
                         disabled={this.props.cfg.FirmwareVersionString == "0.0.0"}
@@ -54,7 +59,18 @@ export default class Home extends React.Component<Props, State> {
                         startIcon={<DisplaySettingsIcon/>}
                         onClick={() => route("/device/display")}
                     >
-                        Display
+                        {t("display")}
+                    </Button>
+                }
+
+                {this.props.bt.connStatus == BTConnStatus.CONNECTED && this.props.cfg.FirmwareVersion.GreaterThanString("0.0.2") &&
+                    <Button
+                        disabled={this.props.cfg.FirmwareVersionString == "0.0.0"}
+                        variant={"contained"}
+                        startIcon={<LocationIcon/>}
+                        onClick={() => route("/device/location")}
+                    >
+                        {t("location")}
                     </Button>
                 }
 
