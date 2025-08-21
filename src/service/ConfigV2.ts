@@ -1,7 +1,6 @@
 import {signal, Signal} from "@preact/signals";
 import {ConnStatus as btConnStatus, Service as btSvc} from "./Bluetooth";
 import {ShowMode, FirmwareVersion, DisplayType} from "./Types";
-import {debug} from "yaml/util";
 
 enum chrcUUID {
     firmwareVersion = 0xf000,
