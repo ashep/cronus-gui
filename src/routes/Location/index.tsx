@@ -155,7 +155,7 @@ export default class Home extends React.Component<Props, State> {
                 :
                 <Stack direction={"column"} spacing={3}>
                     <Typography sx={{width: 300}}>
-                        <b>{t("currentLocation")}:</b> {this.props.cfg.LocationName}
+                        <b>{t("currentLocation")}:</b> {this.props.cfg.LocationName ? this.props.cfg.LocationName : t("notSet").toLowerCase()}
                     </Typography>
 
                     {!this.selectVisible.value &&

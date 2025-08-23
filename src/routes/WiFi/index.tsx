@@ -14,6 +14,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 import * as BTSvc from "../../service/Bluetooth";
 import * as WiFiSvc from "../../service/WiFi";
+import {useTranslation} from "react-i18next";
 
 interface Props {
     btConnStatus: BTSvc.ConnStatus
@@ -36,10 +37,12 @@ export default class WiFi extends React.Component<Props, State> {
     }
 
     renderSSIDChooser(): React.JSX.Element {
+        const {t} = useTranslation();
+
         return (
             <Box sx={{flexDirection: "column", alignItems: "center"}}>
                 <Box sx={{mb: 2}}>
-                    Choose your Wi-Fi network:
+                    {t("selectWiFiNetwork")}:
                 </Box>
 
                 {!this.props.wifiSvc.ssidList.length &&
@@ -63,7 +66,7 @@ export default class WiFi extends React.Component<Props, State> {
                         </Button>
                     )}
                     <Button variant={"outlined"} startIcon={<ArrowBackIcon/>} onClick={() => route("/device")}>
-                        Back
+                        {t("back")}
                     </Button>
                 </Stack>
             </Box>
@@ -71,6 +74,8 @@ export default class WiFi extends React.Component<Props, State> {
     }
 
     renderCredentialsForm(): React.JSX.Element {
+        const {t} = useTranslation();
+
         return (
             <Box component="form" onSubmit={async e => {
                 e.preventDefault();
@@ -80,11 +85,11 @@ export default class WiFi extends React.Component<Props, State> {
                 <Stack direction={"column"} spacing={1}>
                     {this.props.wifiSvc.connStatus == WiFiSvc.ConnStatus.DISCONNECTED && this._connTry > 0 &&
                         <Typography variant={"subtitle1"} color={"error"}>
-                            Connection failed, check the password
+                            {t("connFailed")}
                         </Typography>
                     }
                     <TextField required autoFocus
-                               label="Password"
+                               label={t("password")}
                                variant="outlined"
                                type={"password"}
                                value={this.state.credentials.password}
@@ -102,7 +107,7 @@ export default class WiFi extends React.Component<Props, State> {
                                 <CircularProgress size={20}/> : <WiFiIcon/>}
                             disabled={!this.state.credentials.password.length || this.props.wifiSvc.connStatus == WiFiSvc.ConnStatus.CONNECTING}
                     >
-                        {this.props.wifiSvc.connStatus == WiFiSvc.ConnStatus.CONNECTING ? "Connecting" : "Connect"} to {this.state.credentials.ssid}
+                        {this.props.wifiSvc.connStatus == WiFiSvc.ConnStatus.CONNECTING ? t("connectingTo") : t("connectTo")} {this.state.credentials.ssid}
                     </Button>
                     <Button variant={"outlined"}
                             startIcon={<ArrowBackIcon/>}
@@ -113,7 +118,7 @@ export default class WiFi extends React.Component<Props, State> {
                                     credentials: {ssid: "", password: ""},
                                 });
                             }}>
-                        Other network
+                        {t("otherNetwork")}
                     </Button>
                 </Stack>
             </Box>
@@ -121,12 +126,14 @@ export default class WiFi extends React.Component<Props, State> {
     }
 
     renderConnected(): React.JSX.Element {
+        const {t} = useTranslation();
+
         return (
             <Stack direction={"column"} spacing={1}>
                 {this.props.wifiSvc.connectedSSID &&
                     <Typography variant={"subtitle1"} sx={{mb: 2}}>
-                        <WiFiIcon sx={{verticalAlign: "middle"}}/> Connected
-                        to <b>{this.props.wifiSvc.connectedSSID}</b>
+                        <WiFiIcon sx={{verticalAlign: "middle"}}/>&nbsp;
+                        {t("connectedTo")}&nbsp;<b>{this.props.wifiSvc.connectedSSID}</b>
                     </Typography>
                 }
                 <Button variant={"contained"}
@@ -139,16 +146,18 @@ export default class WiFi extends React.Component<Props, State> {
                         }}
                         disabled={this.props.wifiSvc.connectedSSID == ""}
                 >
-                    Disconnect
+                    {t("disconnect")}
                 </Button>
                 <Button variant={"outlined"} startIcon={<ArrowBackIcon/>} onClick={() => route("/device")}>
-                    Back
+                    {t("back")}
                 </Button>
             </Stack>
         )
     }
 
     render(): React.JSX.Element {
+        const {t} = useTranslation();
+
         return <Grid container
                      spacing={0}
                      direction="column"
@@ -161,8 +170,8 @@ export default class WiFi extends React.Component<Props, State> {
             {this.props.btConnStatus != BTSvc.ConnStatus.CONNECTED
                 ?
                 <Box>
-                    You're not connected to your Cronus device.
-                    Click <Link href={"/device/"}>here</Link> to connect.
+                    {t("noBluetoothConnection")}. <br/>
+                    {t("clickTo")} <Link href={"/device/"}>{t("connect").toLowerCase()}</Link>.
                 </Box>
                 :
                 <Stack direction={"column"} spacing={1}>

@@ -28,6 +28,7 @@ interface State {
 const durationValues = [
     {value: 0, label: "Don't show"},
     {value: 1, label: '1 sec'},
+    {value: 2, label: '2 sec'},
     {value: 3, label: '3 sec'},
     {value: 5, label: '5 sec'},
     {value: 15, label: '15 sec'},
