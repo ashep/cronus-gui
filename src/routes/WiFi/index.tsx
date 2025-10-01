@@ -170,8 +170,8 @@ export default class WiFi extends React.Component<Props, State> {
             {this.props.btConnStatus != BTSvc.ConnStatus.CONNECTED
                 ?
                 <Box>
-                    {t("noBluetoothConnection")}. <br/>
-                    {t("clickTo")} <Link href={"/device/"}>{t("connect").toLowerCase()}</Link>.
+                    {t("noBluetoothConnection")}.&nbsp;
+                    {t("clickTo")} <Link href={"/device"}>{t("connect").toLowerCase()}</Link>.
                 </Box>
                 :
                 <Stack direction={"column"} spacing={1}>

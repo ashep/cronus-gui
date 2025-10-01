@@ -74,12 +74,12 @@ export class Service {
         return this.useV2 ? this.v2.MaxBrightness : this.v1.MaxBrightness;
     }
 
-    get ShowTimeDuration(): number {
-        return this.useV2 ? this.v2.ShowTimeDuration : this.v1.ShowTimeDuration;
+    get WidgetTimeDuration(): number {
+        return this.useV2 ? this.v2.WidgetTimeDuration : this.v1.ShowTimeDuration;
     }
 
-    get ShowDateDuration(): number {
-        return this.useV2 ? this.v2.ShowDateDuration : this.v1.ShowDateDuration;
+    get WidgetDateDuration(): number {
+        return this.useV2 ? this.v2.WidgetDateDuration : this.v1.ShowDateDuration;
     }
 
     get LocationName(): string {
@@ -94,19 +94,31 @@ export class Service {
         return this.v2.LocationLng;
     }
 
-    get ShowOutdoorTempDuration(): number {
+    get WidgetOutdoorTempDuration(): number {
         if (!this.useV2) {
             return this.v1.ShowOdrTempDuration;
         }
-        return this.v2.ShowOutdoorTempDuration;
+        return this.v2.WidgetOutdoorTempDuration;
     }
 
-    get ShowWeatherIconDuration(): number {
-        return this.useV2 ? this.v2.ShowWeatherIconDuration : this.v1.ShowWeatherIconDuration;
+    get WidgetWeatherIconDuration(): number {
+        return this.useV2 ? this.v2.WidgetWeatherIconDuration : this.v1.ShowWeatherIconDuration;
     }
 
     get AllowUnstableFirmware(): boolean {
         return this.useV2 ? this.v2.AllowUnstableFirmware : this.v1.AllowUnstableFirmware;
+    }
+
+    get WidgetTimeColor(): number {
+        return this.useV2 ? this.v2.WidgetTimeColor : 0;
+    }
+
+    get WidgetDateColor(): number {
+        return this.useV2 ? this.v2.WidgetDateColor : 0;
+    }
+
+    get WidgetOutdoorTempColor(): number {
+        return this.useV2 ? this.v2.WidgetOutdoorTempColor : 0;
     }
 
     async SetMinBrightness(v: number) {
@@ -122,19 +134,19 @@ export class Service {
     }
 
     async SetShowTimeDuration(v: number): Promise<void> {
-        return this.useV2 ? this.v2.SetShowTimeDuration(v) : this.v1.SetShowTimeDuration(v);
+        return this.useV2 ? this.v2.SetWidgetTimeDuration(v) : this.v1.SetShowTimeDuration(v);
     }
 
-    async SetShowDateDuration(v: number): Promise<void> {
-        return this.useV2 ? this.v2.SetShowDateDuration(v) : this.v1.SetShowDateDuration(v);
+    async SetWidgetDateDuration(v: number): Promise<void> {
+        return this.useV2 ? this.v2.SetWidgetDateDuration(v) : this.v1.SetShowDateDuration(v);
     }
 
     async SetShowOutdoorTempDuration(v: number): Promise<void> {
-        return this.useV2 ? this.v2.SetShowOutdoorTempDuration(v) : this.v1.SetShowOutdoorTempDuration(v);
+        return this.useV2 ? this.v2.SetWidgetOutdoorTempDuration(v) : this.v1.SetShowOutdoorTempDuration(v);
     }
 
     async SetShowWeatherIconDuration(v: number): Promise<void> {
-        return this.useV2 ? this.v2.SetShowWeatherIconDuration(v) : this.v1.SetShowWeatherIconDuration(v);
+        return this.useV2 ? this.v2.SetWidgetWeatherIconDuration(v) : this.v1.SetShowWeatherIconDuration(v);
     }
 
     async SetAllowUnstableFirmware(v: boolean): Promise<void> {
@@ -160,5 +172,26 @@ export class Service {
             throw new Error("Location is only supported in Config V2");
         }
         return this.v2.SetLocationLng(v);
+    }
+
+    async SetWidgetTimeColor(v: number): Promise<void> {
+        if (!this.useV2) {
+            throw new Error("WidgetTimeColor is only supported in Config V2");
+        }
+        return this.v2.SetWidgetTimeColor(v);
+    }
+
+    async SetWidgetDateColor(v: number): Promise<void> {
+        if (!this.useV2) {
+            throw new Error("WidgetDateColor is only supported in Config V2");
+        }
+        return this.v2.SetWidgetDateColor(v);
+    }
+
+    async SetWidgetOutdoorTempColor(v: number): Promise<void> {
+        if (!this.useV2) {
+            throw new Error("WidgetOutdoorTempColor is only supported in Config V2");
+        }
+        return this.v2.SetWidgetOutdoorTempColor(v);
     }
 }

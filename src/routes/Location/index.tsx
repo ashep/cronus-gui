@@ -149,8 +149,8 @@ export default class Home extends React.Component<Props, State> {
             {this.props.btConnStatus != BTSvc.ConnStatus.CONNECTED
                 ?
                 <Box>
-                    You're not connected to your Cronus device.
-                    Click <Link href={"/device"}>here</Link> to connect.
+                    {t("noBluetoothConnection")}.&nbsp;
+                    {t("clickTo")} <Link href={"/device"}>{t("connect").toLowerCase()}</Link>.
                 </Box>
                 :
                 <Stack direction={"column"} spacing={3}>

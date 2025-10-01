@@ -1,8 +1,9 @@
 import * as React from "react";
+import {Link, route} from "preact-router";
+import {useTranslation} from "react-i18next";
 import * as BTSvc from "../../service/Bluetooth";
 import * as ConfigSvc from "../../service/Config";
-import {ShowMode} from "../../service/Types";
-import {Link, route} from "preact-router";
+import {DisplayType, ShowMode} from "../../service/Types";
 
 import Grid from "@mui/material/Grid";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -48,8 +49,29 @@ const brightnessValues = [
     {value: 15, label: "100%"},
 ]
 
+const colorValues = [
+    {value: 0, label: "colorBlack"},
+    {value: 1, label: "colorRed"},
+    {value: 2, label: "colorGreen"},
+    {value: 3, label: "colorBlue"},
+    {value: 4, label: "colorCyan"},
+    {value: 5, label: "colorMagenta"},
+    {value: 6, label: "colorYellow"},
+    {value: 7, label: "colorWhite"},
+    {value: 8, label: "colorOrange"},
+    {value: 9, label: "colorPurple"},
+    {value: 10, label: "colorPink"},
+    {value: 11, label: "colorLime"},
+    {value: 12, label: "colorTeal"},
+    {value: 13, label: "colorBrown"},
+    {value: 14, label: "colorGold"},
+    {value: 15, label: "colorSilver"},
+]
+
 export default class Display extends React.Component<Props, State> {
     render(): React.JSX.Element {
+        const {t} = useTranslation();
+
         return <Grid container
                      spacing={0}
                      direction="column"
@@ -62,13 +84,13 @@ export default class Display extends React.Component<Props, State> {
             {this.props.btConnStatus != BTSvc.ConnStatus.CONNECTED
                 ?
                 <Box>
-                    You're not connected to your Cronus device.
-                    Click <Link href={"/device"}>here</Link> to connect.
+                    {t("noBluetoothConnection")}.&nbsp;
+                    {t("clickTo")} <Link href={"/device"}>{t("connect").toLowerCase()}</Link>.
                 </Box>
                 :
-                <Stack direction={"column"} spacing={3}>
+                <Stack direction={"column"} spacing={3} minWidth={200} >
                     <FormControlLabel
-                        label="Multiline mode"
+                        label={t("multiLineMode")}
                         control={
                             <Checkbox checked={this.props.cfg.ShowMode == ShowMode.MultiLine}
                                       onChange={(_, v) => {
@@ -79,12 +101,12 @@ export default class Display extends React.Component<Props, State> {
                     />
 
                     <FormControl variant="standard">
-                        <InputLabel id="min-brightness-label">Minimum brightness</InputLabel>
+                        <InputLabel id="min-brightness-label">{t("minBrightness")}</InputLabel>
                         <Select
-                            labelId="min-brightness-duration"
-                            id="min-brightness-duration-select"
+                            labelId="min-brightness"
+                            id="min-brightness-duration"
                             value={this.props.cfg.MinBrightness}
-                            label="minimum brightness level"
+                            label={t("minBrightness")}
                             onChange={(e) => this.props.cfg.SetMinBrightness(Number((e.target as HTMLInputElement).value))}
                         >
                             {brightnessValues.map((opt) => {
@@ -97,12 +119,12 @@ export default class Display extends React.Component<Props, State> {
                     </FormControl>
 
                     <FormControl variant="standard">
-                        <InputLabel id="max-brightness-label">Maximum brightness</InputLabel>
+                        <InputLabel id="max-brightness-label">{t("maxBrightness")}</InputLabel>
                         <Select
-                            labelId="max-brightness-duration"
-                            id="max-brightness-duration-select"
+                            labelId="max-brightness"
+                            id="max-brightness-select"
                             value={this.props.cfg.MaxBrightness}
-                            label="Maximum brightness level"
+                            label={t("maxBrightness")}
                             onChange={(e) => this.props.cfg.SetMaxBrightness(Number((e.target as HTMLInputElement).value))}
                         >
                             {brightnessValues.map(opt => (
@@ -113,12 +135,12 @@ export default class Display extends React.Component<Props, State> {
 
                     {this.props.cfg.ShowMode == ShowMode.SingleLine && (
                         <FormControl variant="standard">
-                            <InputLabel id="show-time-duration-label">Show time</InputLabel>
+                            <InputLabel id="show-time-duration-label">{t("showTime")}</InputLabel>
                             <Select
                                 labelId="show-time-duration"
                                 id="show-time-duration-select"
-                                value={this.props.cfg.ShowTimeDuration}
-                                label="Show time"
+                                value={this.props.cfg.WidgetTimeDuration}
+                                label={t("showTime")}
                                 onChange={(e) => this.props.cfg.SetShowTimeDuration(Number((e.target as HTMLInputElement).value))}
                             >
                                 {durationValues.map(opt => (
@@ -128,14 +150,31 @@ export default class Display extends React.Component<Props, State> {
                         </FormControl>
                     )}
 
+                    {this.props.cfg.DisplayType == DisplayType.WS2812_32X16 && (
+                        <FormControl variant="standard">
+                            <InputLabel id="widget-time-color">{t("timeColor")}</InputLabel>
+                            <Select
+                                labelId="widget-time-color"
+                                id="widget-time-color-select"
+                                value={this.props.cfg.WidgetTimeColor}
+                                label={t("timeColor")}
+                                onChange={(e) => this.props.cfg.SetWidgetTimeColor(Number((e.target as HTMLInputElement).value))}
+                            >
+                                {colorValues.map(opt => (
+                                    <MenuItem key={opt.value} value={opt.value}>{t(opt.label)}</MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    )}
+
                     <FormControl variant="standard">
-                        <InputLabel id="show-date-duration-label">Show date</InputLabel>
+                        <InputLabel id="show-date-duration-label">{t("showDate")}</InputLabel>
                         <Select
-                            labelId="show-time-duration"
-                            id="show-time-duration-select"
-                            value={this.props.cfg.ShowDateDuration}
-                            label="Show time"
-                            onChange={(e) => this.props.cfg.SetShowDateDuration(Number((e.target as HTMLInputElement).value))}
+                            labelId="show-date-duration"
+                            id="show-date-duration-select"
+                            value={this.props.cfg.WidgetDateDuration}
+                            label={t("showDate")}
+                            onChange={(e) => this.props.cfg.SetWidgetDateDuration(Number((e.target as HTMLInputElement).value))}
                         >
                             {durationValues.map(opt => (
                                 <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
@@ -143,13 +182,30 @@ export default class Display extends React.Component<Props, State> {
                         </Select>
                     </FormControl>
 
+                    {this.props.cfg.DisplayType == DisplayType.WS2812_32X16 && (
+                        <FormControl variant="standard">
+                            <InputLabel id="widget-date-color">{t("dateColor")}</InputLabel>
+                            <Select
+                                labelId="widget-date-color"
+                                id="widget-date-color-select"
+                                value={this.props.cfg.WidgetDateColor}
+                                label={t("dateColor")}
+                                onChange={(e) => this.props.cfg.SetWidgetDateColor(Number((e.target as HTMLInputElement).value))}
+                            >
+                                {colorValues.map(opt => (
+                                    <MenuItem key={opt.value} value={opt.value}>{t(opt.label)}</MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    )}
+
                     <FormControl variant="standard">
-                        <InputLabel id="show-odr-temp-duration-label">Show outdoor temp</InputLabel>
+                        <InputLabel id="show-odr-temp-duration-label">{t("showOutdoorTemp")}</InputLabel>
                         <Select
                             labelId="show-odr-temp-duration"
                             id="show-odr-duration-select"
-                            value={this.props.cfg.ShowOutdoorTempDuration}
-                            label="Show outdoor temperature"
+                            value={this.props.cfg.WidgetOutdoorTempDuration}
+                            label={t("showOutdoorTemp")}
                             onChange={(e) => this.props.cfg.SetShowOutdoorTempDuration(Number((e.target as HTMLInputElement).value))}
                         >
                             {durationValues.map(opt => (
@@ -158,14 +214,31 @@ export default class Display extends React.Component<Props, State> {
                         </Select>
                     </FormControl>
 
+                    {this.props.cfg.DisplayType == DisplayType.WS2812_32X16 && (
+                        <FormControl variant="standard">
+                            <InputLabel id="widget-outdoor-temp-color">{t("outdoorTempColor")}</InputLabel>
+                            <Select
+                                labelId="widget-outdoor-temp-color"
+                                id="widget-outdoor-temp-color-select"
+                                value={this.props.cfg.WidgetOutdoorTempColor}
+                                label={t("outdoorTempColor")}
+                                onChange={(e) => this.props.cfg.SetWidgetOutdoorTempColor(Number((e.target as HTMLInputElement).value))}
+                            >
+                                {colorValues.map(opt => (
+                                    <MenuItem key={opt.value} value={opt.value}>{t(opt.label)}</MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    )}
+                    
                     {(this.props.cfg.ShowMode == ShowMode.SingleLine && this.props.cfg.FirmwareVersion.GreaterThanString("0.0.1")) && (
                         <FormControl variant="standard">
-                            <InputLabel id="show-weather-icon-duration-label">Show weather icon</InputLabel>
+                            <InputLabel id="show-weather-icon-duration-label">{t("showWeatherIcon")}</InputLabel>
                             <Select
                                 labelId="show-weather-icon-duration"
                                 id="show-weather-icon-select"
-                                value={this.props.cfg.ShowWeatherIconDuration}
-                                label="Show weather icon"
+                                value={this.props.cfg.WidgetWeatherIconDuration}
+                                label={t("showWeatherIcon")}
                                 onChange={(e) => this.props.cfg.SetShowWeatherIconDuration(Number((e.target as HTMLInputElement).value))}
                             >
                                 {durationValues.map(opt => (
@@ -176,7 +249,7 @@ export default class Display extends React.Component<Props, State> {
                     )}
 
                     <Button variant={"outlined"} startIcon={<ArrowBackIcon/>} onClick={() => route("/device")}>
-                        Back
+                        {t("back")}
                     </Button>
                 </Stack>
             }

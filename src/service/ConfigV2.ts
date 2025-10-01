@@ -9,16 +9,21 @@ enum chrcUUID {
     showMode = 0xf010,
     minBrightness = 0xf011,
     maxBrightness = 0xf012,
-    showTimeDuration = 0xf013,
-    showDateDuration = 0xf014,
-    showDayOfWeekDuration = 0xf015, // not implemented
-    showAmbientTempDuration = 0xf016, // not implemented
-    showOutdoorTempDuration = 0xf017,
+    widgetTimeDuration = 0xf013,
+    widgetDateDuration = 0xf014,
+    widgetDayOfWeekDuration = 0xf015, // not implemented
+    widgetAmbientTempDuration = 0xf016, // not implemented
+    widgetOutdoorTempDuration = 0xf017,
     allowUnstableFirmware = 0xf018,
     showWeatherIconDuration = 0xf019,
     locationName = 0xf01a,
     locationLat = 0xf01b,
     locationLng = 0xf01c,
+    widgetTimeColor = 0xf01d,
+    widgetDateColor = 0xf01e,
+    widgetDayOfWeekColor = 0xf01f, // not implemented
+    widgetAmbientTempColor = 0xf020, // not implemented
+    widgetOutdoorTempColor = 0xf021,
 }
 
 export class Service {
@@ -30,14 +35,19 @@ export class Service {
     private showMode: Signal<ShowMode> = signal(ShowMode.SingleLine);
     private minBrightness: Signal<number> = signal(0);
     private maxBrightness: Signal<number> = signal(0);
-    private showTimeDuration: Signal<number> = signal(0);
-    private showDateDuration: Signal<number> = signal(0);
-    private showOutdoorTempDuration: Signal<number> = signal(0);
+    private widgetTimeDuration: Signal<number> = signal(0);
+    private widgetDateDuration: Signal<number> = signal(0);
+    private widgetOutdoorTempDuration: Signal<number> = signal(0);
     private allowUnstableFirmware: Signal<boolean> = signal(false);
-    private showWeatherIconDuration: Signal<number> = signal(0);
+    private widgetWeatherIconDuration: Signal<number> = signal(0);
     private locationName: Signal<string> = signal("");
     private locationLat: Signal<number> = signal(0);
     private locationLng: Signal<number> = signal(0);
+    private widgetTimeColor: Signal<number> = signal(0);
+    private widgetDateColor: Signal<number> = signal(0);
+    private widgetDayOfWeekColor: Signal<number> = signal(0);
+    private widgetAmbientTempColor: Signal<number> = signal(0);
+    private widgetOutdoorTempColor: Signal<number> = signal(0);
 
     constructor(btSvc: btSvc) {
         this.bt = btSvc;
@@ -60,20 +70,20 @@ export class Service {
         await this.readCharacteristic(chrcUUID.maxBrightness).then(v => {
             this.maxBrightness.value = v.getUint8(0);
         })
-        await this.readCharacteristic(chrcUUID.showTimeDuration).then(v => {
-            this.showTimeDuration.value = v.getUint8(0);
+        await this.readCharacteristic(chrcUUID.widgetTimeDuration).then(v => {
+            this.widgetTimeDuration.value = v.getUint8(0);
         })
-        await this.readCharacteristic(chrcUUID.showDateDuration).then(v => {
-            this.showDateDuration.value = v.getUint8(0);
+        await this.readCharacteristic(chrcUUID.widgetDateDuration).then(v => {
+            this.widgetDateDuration.value = v.getUint8(0);
         })
-        await this.readCharacteristic(chrcUUID.showOutdoorTempDuration).then(v => {
-            this.showOutdoorTempDuration.value = v.getUint8(0);
+        await this.readCharacteristic(chrcUUID.widgetOutdoorTempDuration).then(v => {
+            this.widgetOutdoorTempDuration.value = v.getUint8(0);
         })
         await this.readCharacteristic(chrcUUID.allowUnstableFirmware).then(v => {
             this.allowUnstableFirmware.value = v.getUint8(0) != 0;
         })
         await this.readCharacteristic(chrcUUID.showWeatherIconDuration).then(v => {
-            this.showWeatherIconDuration.value = v.getUint8(0);
+            this.widgetWeatherIconDuration.value = v.getUint8(0);
         })
 
         if (this.firmwareVersion.value.GreaterThanString("0.0.2")) {
@@ -85,6 +95,24 @@ export class Service {
             })
             await this.readCharacteristic(chrcUUID.locationLng).then(v => {
                 this.locationLng.value = v.getFloat32(0);
+            })
+        }
+
+        if (this.firmwareVersion.value.GreaterThanString("0.0.3")) {
+            await this.readCharacteristic(chrcUUID.widgetTimeColor).then(v => {
+                this.widgetTimeColor.value = v.getUint8(0);
+            })
+            await this.readCharacteristic(chrcUUID.widgetDateColor).then(v => {
+                this.widgetDateColor.value = v.getUint8(0);
+            })
+            await this.readCharacteristic(chrcUUID.widgetDayOfWeekColor).then(v => {
+                this.widgetDayOfWeekColor.value = v.getUint8(0);
+            })
+            await this.readCharacteristic(chrcUUID.widgetAmbientTempColor).then(v => {
+                this.widgetAmbientTempColor.value = v.getUint8(0);
+            })
+            await this.readCharacteristic(chrcUUID.widgetOutdoorTempColor).then(v => {
+                this.widgetOutdoorTempColor.value = v.getUint8(0);
             })
         }
     }
@@ -109,24 +137,24 @@ export class Service {
         return this.maxBrightness.value;
     }
 
-    get ShowTimeDuration(): number {
-        return this.showTimeDuration.value;
+    get WidgetTimeDuration(): number {
+        return this.widgetTimeDuration.value;
     }
 
-    get ShowDateDuration(): number {
-        return this.showDateDuration.value;
+    get WidgetDateDuration(): number {
+        return this.widgetDateDuration.value;
     }
 
-    get ShowOutdoorTempDuration(): number {
-        return this.showOutdoorTempDuration.value;
+    get WidgetOutdoorTempDuration(): number {
+        return this.widgetOutdoorTempDuration.value;
     }
 
     get AllowUnstableFirmware(): boolean {
         return this.allowUnstableFirmware.value;
     }
 
-    get ShowWeatherIconDuration(): number {
-        return this.showWeatherIconDuration.value;
+    get WidgetWeatherIconDuration(): number {
+        return this.widgetWeatherIconDuration.value;
     }
 
     get LocationName(): string {
@@ -139,6 +167,18 @@ export class Service {
 
     get LocationLng(): number {
         return this.locationLng.value;
+    }
+
+    get WidgetTimeColor(): number {
+        return this.widgetTimeColor.value;
+    }
+
+    get WidgetDateColor(): number {
+        return this.widgetDateColor.value;
+    }
+
+    get WidgetOutdoorTempColor(): number {
+        return this.widgetOutdoorTempColor.value;
     }
 
     async SetShowMode(v: ShowMode): Promise<void> {
@@ -156,19 +196,19 @@ export class Service {
         this.maxBrightness.value = v;
     }
 
-    async SetShowTimeDuration(v: number): Promise<void> {
-        await this.writeCharacteristic(chrcUUID.showTimeDuration, v);
-        this.showTimeDuration.value = v;
+    async SetWidgetTimeDuration(v: number): Promise<void> {
+        await this.writeCharacteristic(chrcUUID.widgetTimeDuration, v);
+        this.widgetTimeDuration.value = v;
     }
 
-    async SetShowDateDuration(v: number): Promise<void> {
-        await this.writeCharacteristic(chrcUUID.showDateDuration, v);
-        this.showDateDuration.value = v;
+    async SetWidgetDateDuration(v: number): Promise<void> {
+        await this.writeCharacteristic(chrcUUID.widgetDateDuration, v);
+        this.widgetDateDuration.value = v;
     }
 
-    async SetShowOutdoorTempDuration(v: number): Promise<void> {
-        await this.writeCharacteristic(chrcUUID.showOutdoorTempDuration, v);
-        this.showOutdoorTempDuration.value = v;
+    async SetWidgetOutdoorTempDuration(v: number): Promise<void> {
+        await this.writeCharacteristic(chrcUUID.widgetOutdoorTempDuration, v);
+        this.widgetOutdoorTempDuration.value = v;
     }
 
     async SetAllowUnstableFirmware(v: boolean): Promise<void> {
@@ -176,9 +216,9 @@ export class Service {
         this.allowUnstableFirmware.value = v;
     }
 
-    async SetShowWeatherIconDuration(v: number): Promise<void> {
+    async SetWidgetWeatherIconDuration(v: number): Promise<void> {
         await this.writeCharacteristic(chrcUUID.showWeatherIconDuration, v);
-        this.showWeatherIconDuration.value = v;
+        this.widgetWeatherIconDuration.value = v;
     }
 
     async SetLocationName(v: string): Promise<void> {
@@ -194,6 +234,21 @@ export class Service {
     async SetLocationLng(v: number): Promise<void> {
         await this.writeCharacteristic(chrcUUID.locationLng, v);
         this.locationLng.value = v;
+    }
+
+    async SetWidgetTimeColor(v: number): Promise<void> {
+        await this.writeCharacteristic(chrcUUID.widgetTimeColor, v);
+        this.widgetTimeColor.value = v;
+    }
+
+    async SetWidgetDateColor(v: number): Promise<void> {
+        await this.writeCharacteristic(chrcUUID.widgetDateColor, v);
+        this.widgetDateColor.value = v;
+    }
+
+    async SetWidgetOutdoorTempColor(v: number): Promise<void> {
+        await this.writeCharacteristic(chrcUUID.widgetOutdoorTempColor, v);
+        this.widgetOutdoorTempColor.value = v;
     }
 
     private async readCharacteristic(uuid: chrcUUID) {
