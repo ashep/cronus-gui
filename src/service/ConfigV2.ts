@@ -24,6 +24,9 @@ enum chrcUUID {
     widgetDayOfWeekColor = 0xf01f, // not implemented
     widgetAmbientTempColor = 0xf020, // not implemented
     widgetOutdoorTempColor = 0xf021,
+    widgetNightModeEnabled = 0xf022,
+    widgetNightModeColor = 0xf023,
+    widgetAirRaidAlertDuration = 0xf024,
 }
 
 export class Service {
@@ -48,6 +51,7 @@ export class Service {
     private widgetDayOfWeekColor: Signal<number> = signal(0);
     private widgetAmbientTempColor: Signal<number> = signal(0);
     private widgetOutdoorTempColor: Signal<number> = signal(0);
+    private widgetAirRaidAlertDuration: Signal<number> = signal(0);
 
     constructor(btSvc: btSvc) {
         this.bt = btSvc;
@@ -115,6 +119,12 @@ export class Service {
                 this.widgetOutdoorTempColor.value = v.getUint8(0);
             })
         }
+
+        if (this.firmwareVersion.value.GreaterThanString("0.0.4")) {
+            await this.readCharacteristic(chrcUUID.widgetAirRaidAlertDuration).then(v => {
+                this.widgetAirRaidAlertDuration.value = v.getUint8(0);
+            })
+        }
     }
 
     get FirmwareVersion(): FirmwareVersion {
@@ -179,6 +189,10 @@ export class Service {
 
     get WidgetOutdoorTempColor(): number {
         return this.widgetOutdoorTempColor.value;
+    }
+
+    get WidgetAirRaidAlertDuration(): number {
+        return this.widgetAirRaidAlertDuration.value;
     }
 
     async SetShowMode(v: ShowMode): Promise<void> {
@@ -249,6 +263,11 @@ export class Service {
     async SetWidgetOutdoorTempColor(v: number): Promise<void> {
         await this.writeCharacteristic(chrcUUID.widgetOutdoorTempColor, v);
         this.widgetOutdoorTempColor.value = v;
+    }
+
+    async SetWidgetAirRaidAlertIconDuration(v: number): Promise<void> {
+        await this.writeCharacteristic(chrcUUID.widgetAirRaidAlertDuration, v);
+        this.widgetAirRaidAlertDuration.value = v;
     }
 
     private async readCharacteristic(uuid: chrcUUID) {

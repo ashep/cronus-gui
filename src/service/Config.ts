@@ -121,6 +121,10 @@ export class Service {
         return this.useV2 ? this.v2.WidgetOutdoorTempColor : 0;
     }
 
+    get WidgetAirRaidAlertIconDuration(): number {
+        return this.useV2 ? this.v2.WidgetAirRaidAlertDuration : 0;
+    }
+
     async SetMinBrightness(v: number) {
         return this.useV2 ? this.v2.SetMinBrightness(v) : this.v1.SetDisplayMinBrightness(v);
     }
@@ -193,5 +197,12 @@ export class Service {
             throw new Error("WidgetOutdoorTempColor is only supported in Config V2");
         }
         return this.v2.SetWidgetOutdoorTempColor(v);
+    }
+
+    async SetWidgetAirRaidAlertIconDuration(v: number): Promise<void> {
+        if (!this.useV2) {
+            throw new Error("SetWidgetAirRaidAlertIconDuration is only supported in Config V2");
+        }
+        return this.v2.SetWidgetAirRaidAlertIconDuration(v);
     }
 }

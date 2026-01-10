@@ -248,6 +248,23 @@ export default class Display extends React.Component<Props, State> {
                         </FormControl>
                     )}
 
+                    {(this.props.cfg.ShowMode == ShowMode.SingleLine && this.props.cfg.FirmwareVersion.GreaterThanString("0.0.4")) && (
+                        <FormControl variant="standard">
+                            <InputLabel id="show-air-raid-alert-icon-duration-label">{t("showAirRaidAlertIcon")}</InputLabel>
+                            <Select
+                                labelId="show-air-raid-alert-icon-duration"
+                                id="show-air-raid-alert-icon-select"
+                                value={this.props.cfg.WidgetAirRaidAlertIconDuration}
+                                label={t("showAirRaidAlertIcon")}
+                                onChange={(e) => this.props.cfg.SetWidgetAirRaidAlertIconDuration(Number((e.target as HTMLInputElement).value))}
+                            >
+                                {durationValues.map(opt => (
+                                    <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    )}
+
                     <Button variant={"outlined"} startIcon={<ArrowBackIcon/>} onClick={() => route("/device")}>
                         {t("back")}
                     </Button>
