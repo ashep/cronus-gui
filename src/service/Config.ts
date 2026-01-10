@@ -122,7 +122,7 @@ export class Service {
     }
 
     get WidgetAirRaidAlertIconDuration(): number {
-        return this.useV2 ? this.v2.WidgetAirRaidAlertDuration : 0;
+        return this.useV2 ? this.v2.WidgetAirRaidAlertIconDuration : 0;
     }
 
     async SetMinBrightness(v: number) {

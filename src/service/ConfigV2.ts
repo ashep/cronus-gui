@@ -15,7 +15,7 @@ enum chrcUUID {
     widgetAmbientTempDuration = 0xf016, // not implemented
     widgetOutdoorTempDuration = 0xf017,
     allowUnstableFirmware = 0xf018,
-    showWeatherIconDuration = 0xf019,
+    widgetWeatherIconDuration = 0xf019,
     locationName = 0xf01a,
     locationLat = 0xf01b,
     locationLng = 0xf01c,
@@ -26,7 +26,7 @@ enum chrcUUID {
     widgetOutdoorTempColor = 0xf021,
     widgetNightModeEnabled = 0xf022,
     widgetNightModeColor = 0xf023,
-    widgetAirRaidAlertDuration = 0xf024,
+    widgetAirRaidAlertIconDuration = 0xf024,
 }
 
 export class Service {
@@ -51,7 +51,7 @@ export class Service {
     private widgetDayOfWeekColor: Signal<number> = signal(0);
     private widgetAmbientTempColor: Signal<number> = signal(0);
     private widgetOutdoorTempColor: Signal<number> = signal(0);
-    private widgetAirRaidAlertDuration: Signal<number> = signal(0);
+    private widgetAirRaidAlertIconDuration: Signal<number> = signal(0);
 
     constructor(btSvc: btSvc) {
         this.bt = btSvc;
@@ -86,7 +86,7 @@ export class Service {
         await this.readCharacteristic(chrcUUID.allowUnstableFirmware).then(v => {
             this.allowUnstableFirmware.value = v.getUint8(0) != 0;
         })
-        await this.readCharacteristic(chrcUUID.showWeatherIconDuration).then(v => {
+        await this.readCharacteristic(chrcUUID.widgetWeatherIconDuration).then(v => {
             this.widgetWeatherIconDuration.value = v.getUint8(0);
         })
 
@@ -121,8 +121,8 @@ export class Service {
         }
 
         if (this.firmwareVersion.value.GreaterThanString("0.0.4")) {
-            await this.readCharacteristic(chrcUUID.widgetAirRaidAlertDuration).then(v => {
-                this.widgetAirRaidAlertDuration.value = v.getUint8(0);
+            await this.readCharacteristic(chrcUUID.widgetAirRaidAlertIconDuration).then(v => {
+                this.widgetAirRaidAlertIconDuration.value = v.getUint8(0);
             })
         }
     }
@@ -191,8 +191,8 @@ export class Service {
         return this.widgetOutdoorTempColor.value;
     }
 
-    get WidgetAirRaidAlertDuration(): number {
-        return this.widgetAirRaidAlertDuration.value;
+    get WidgetAirRaidAlertIconDuration(): number {
+        return this.widgetAirRaidAlertIconDuration.value;
     }
 
     async SetShowMode(v: ShowMode): Promise<void> {
@@ -231,7 +231,7 @@ export class Service {
     }
 
     async SetWidgetWeatherIconDuration(v: number): Promise<void> {
-        await this.writeCharacteristic(chrcUUID.showWeatherIconDuration, v);
+        await this.writeCharacteristic(chrcUUID.widgetWeatherIconDuration, v);
         this.widgetWeatherIconDuration.value = v;
     }
 
@@ -266,8 +266,8 @@ export class Service {
     }
 
     async SetWidgetAirRaidAlertIconDuration(v: number): Promise<void> {
-        await this.writeCharacteristic(chrcUUID.widgetAirRaidAlertDuration, v);
-        this.widgetAirRaidAlertDuration.value = v;
+        await this.writeCharacteristic(chrcUUID.widgetAirRaidAlertIconDuration, v);
+        this.widgetAirRaidAlertIconDuration.value = v;
     }
 
     private async readCharacteristic(uuid: chrcUUID) {
